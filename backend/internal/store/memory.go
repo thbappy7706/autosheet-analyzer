@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/example/excel-analyzer/internal/model"
+	"github.com/thbappy7706/autosheet-analyzer/backend/internal/model"
 )
 
 // MemoryStore is a thread-safe, TTL-based in-memory Store.

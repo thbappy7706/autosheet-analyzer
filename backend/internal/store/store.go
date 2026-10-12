@@ -5,7 +5,7 @@ package store
 import (
 	"time"
 
-	"github.com/example/excel-analyzer/internal/model"
+	"github.com/thbappy7706/autosheet-analyzer/backend/internal/model"
 )
 
 // Entry is a stored upload plus its parsed tables and cached analysis.

@@ -1,4 +1,4 @@
-module github.com/example/excel-analyzer
+module github.com/thbappy7706/autosheet-analyzer/backend
 
 go 1.22
 

@@ -6,10 +6,11 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 	"time"
 
-	"github.com/example/excel-analyzer/internal/model"
+	"github.com/thbappy7706/autosheet-analyzer/backend/internal/model"
 )
 
 func newTestServer() http.Handler {
@@ -150,6 +151,66 @@ func TestUploadAnalysisRowsFlow(t *testing.T) {
 	h.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/api/v1/uploads/"+up.ID, nil))
 	if rec.Code != http.StatusNotFound {
 		t.Fatalf("expected 404 after delete, got %d", rec.Code)
+	}
+}
+
+// Sorting must not depend on whether the client requested the analysis first:
+// the column type is inferred on demand when the cache is cold.
+func TestRowsSortNumericWithoutPriorAnalysis(t *testing.T) {
+	h := newTestServer()
+	up := uploadCSV(t, h, "nums.csv", "name,n\nb,2\na,10\nc,9\n")
+
+	get := func(query string) []string {
+		t.Helper()
+		rec := httptest.NewRecorder()
+		h.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/api/v1/uploads/"+up.ID+"/rows?"+query, nil))
+		if rec.Code != http.StatusOK {
+			t.Fatalf("status = %d, body = %s", rec.Code, rec.Body.String())
+		}
+		var page struct {
+			Rows [][]string `json:"rows"`
+		}
+		if err := json.Unmarshal(rec.Body.Bytes(), &page); err != nil {
+			t.Fatal(err)
+		}
+		out := make([]string, 0, len(page.Rows))
+		for _, r := range page.Rows {
+			out = append(out, r[1])
+		}
+		return out
+	}
+
+	// No /analysis call before the first sort, so the cache is cold here.
+	if got := get("sort=n&order=asc"); !reflect.DeepEqual(got, []string{"2", "9", "10"}) {
+		t.Errorf("cold asc sort = %v, want [2 9 10]", got)
+	}
+	if got := get("sort=n&order=desc"); !reflect.DeepEqual(got, []string{"10", "9", "2"}) {
+		t.Errorf("cold desc sort = %v, want [10 9 2]", got)
+	}
+}
+
+// Non-ISO dates must sort chronologically rather than lexically.
+func TestRowsSortDatesChronologically(t *testing.T) {
+	h := newTestServer()
+	up := uploadCSV(t, h, "dates.csv", "label,d\nlate,5 Jan 2024\nearly,2 Jan 2024\nmid,20 Mar 2024\n")
+
+	rec := httptest.NewRecorder()
+	h.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/api/v1/uploads/"+up.ID+"/rows?sort=d&order=asc", nil))
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d", rec.Code)
+	}
+	var page struct {
+		Rows [][]string `json:"rows"`
+	}
+	if err := json.Unmarshal(rec.Body.Bytes(), &page); err != nil {
+		t.Fatal(err)
+	}
+	labels := make([]string, 0, len(page.Rows))
+	for _, r := range page.Rows {
+		labels = append(labels, r[0])
+	}
+	if !reflect.DeepEqual(labels, []string{"early", "late", "mid"}) {
+		t.Errorf("date sort = %v, want [early late mid]", labels)
 	}
 }
 

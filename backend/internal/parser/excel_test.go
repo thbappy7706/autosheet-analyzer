@@ -70,8 +70,8 @@ func TestOpenAndParseExcel(t *testing.T) {
 
 func TestMultiSheetDefaultIsFirstNonEmpty(t *testing.T) {
 	raw := buildWorkbook(t, map[string][][]any{
-		"Empty":  {{"", ""}},
-		"Data":   {{"a", "b"}, {1, 2}},
+		"Empty": {{"", ""}},
+		"Data":  {{"a", "b"}, {1, 2}},
 	})
 	wb, err := OpenExcel(raw, "multi.xlsx")
 	if err != nil {

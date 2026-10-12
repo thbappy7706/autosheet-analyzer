@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/example/excel-analyzer/internal/store"
 	"github.com/go-chi/chi/v5"
+	"github.com/thbappy7706/autosheet-analyzer/backend/internal/store"
 )
 
 // Config holds runtime settings resolved from environment variables.

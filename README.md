@@ -33,8 +33,26 @@ make dev-backend      # cd backend && go run ./cmd/server
 make dev-frontend     # cd frontend && npm run dev
 ```
 
-Copy [`.env.example`](.env.example) values into your environment to change the
-port, upload limit, store TTL, sampling threshold, CORS origin or rate limit.
+### Configuration
+
+```bash
+cp .env.example .env                     # backend settings, auto-loaded at startup
+cp frontend/.env.example frontend/.env   # frontend settings (Vite loads this file)
+```
+
+The Go server reads `.env` from the working directory or its parent, so
+`make dev-backend` picks up the repository-root file, and logs which file it
+loaded at startup. **Values exported in your shell always take precedence over
+the file**, so overriding one setting for a single run needs no edit:
+
+```bash
+MAX_UPLOAD_MB=200 make dev-backend
+```
+
+Set `ENV_FILE=/path/to/file` to point the server at a different file, and
+`RATE_LIMIT_PER_MIN=0` to disable rate limiting. Both example files are fully
+commented — the backend one covers port, upload limit, store TTL, sampling
+threshold, CORS origin and rate limit.
 
 ### Other make targets
 
@@ -59,6 +77,7 @@ port, upload limit, store TTL, sampling threshold, CORS origin or rate limit.
 │       ├── parser/                csv.go, excel.go, detect.go (delimiter/encoding)
 │       ├── analyzer/              typeinfer.go, stats.go, correlation.go,
 │       │                          insights.go, profile.go, dateparse.go
+│       ├── envload/               dependency-free .env loader
 │       ├── numutil/               messy number parsing (currency, %, Bangla digits)
 │       ├── store/                 storage interface + in-memory TTL implementation
 │       └── model/                 shared structs serialized to JSON
@@ -73,6 +92,8 @@ port, upload limit, store TTL, sampling threshold, CORS origin or rate limit.
 │       └── types/                 analysis types + generated i18n key types
 ├── samples/                       sample CSV and XLSX files to try
 ├── openapi.yaml                   API contract (also documents the JSON schema)
+├── .env.example                   backend settings template (copy to .env)
+├── frontend/.env.example          frontend settings template (copy to frontend/.env)
 └── Makefile
 ```
 
@@ -219,7 +240,10 @@ active language via the `Accept-Language` header.
   (multi-sheet, merged cells, empty sheet, legacy `.xls` error).
 - `api` — full upload → analysis → rows → aggregate → delete flow over
   `httptest`, plus rejection of missing files, mismatched content and unknown
-  extensions.
+  extensions, and sort-order tests proving numeric and date columns sort by
+  value rather than lexically even when the analysis cache is cold.
+- `envload` — `.env` parsing (comments, `export` prefix, quotes, empty values)
+  and the precedence rule that an exported variable is never overwritten.
 
 Fixtures live in `backend/internal/parser/testdata/` (clean, messy, Bangla,
 Excel built in-memory).

@@ -6,7 +6,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/example/excel-analyzer/internal/model"
+	"github.com/thbappy7706/autosheet-analyzer/backend/internal/model"
 )
 
 // ParseCSV parses raw bytes as a delimited text file and normalizes the

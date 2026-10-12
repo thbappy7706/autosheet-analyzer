@@ -6,7 +6,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/example/excel-analyzer/internal/numutil"
+	"github.com/thbappy7706/autosheet-analyzer/backend/internal/numutil"
 )
 
 // DecodeResult is the outcome of an encoding sniff/convert.

@@ -4,7 +4,7 @@ import (
 	"math"
 	"sort"
 
-	"github.com/example/excel-analyzer/internal/model"
+	"github.com/thbappy7706/autosheet-analyzer/backend/internal/model"
 )
 
 // DescribeNumeric computes descriptive statistics for a slice of values.

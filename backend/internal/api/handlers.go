@@ -16,12 +16,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/example/excel-analyzer/internal/analyzer"
-	"github.com/example/excel-analyzer/internal/model"
-	"github.com/example/excel-analyzer/internal/numutil"
-	"github.com/example/excel-analyzer/internal/parser"
-	"github.com/example/excel-analyzer/internal/store"
 	"github.com/go-chi/chi/v5"
+	"github.com/thbappy7706/autosheet-analyzer/backend/internal/analyzer"
+	"github.com/thbappy7706/autosheet-analyzer/backend/internal/model"
+	"github.com/thbappy7706/autosheet-analyzer/backend/internal/numutil"
+	"github.com/thbappy7706/autosheet-analyzer/backend/internal/parser"
+	"github.com/thbappy7706/autosheet-analyzer/backend/internal/store"
 )
 
 var allowedExtensions = map[string]string{
@@ -204,11 +204,7 @@ func (s *Server) handleRows(w http.ResponseWriter, r *http.Request) {
 			writeError(w, http.StatusBadRequest, CodeBadRequest, "unknown sort column", map[string]any{"column": sortCol})
 			return
 		}
-		colType := ""
-		if a, ok := e.Analysis[table.Sheet]; ok && idx < len(a.Columns) {
-			colType = string(a.Columns[idx].Type)
-		}
-		sortRows(rows, idx, order, colType)
+		sortRows(rows, idx, order, s.columnType(e, table, idx))
 	}
 
 	total := len(rows)
@@ -224,14 +220,14 @@ func (s *Server) handleRows(w http.ResponseWriter, r *http.Request) {
 	pageRows := rows[start:end]
 
 	writeJSON(w, http.StatusOK, map[string]any{
-		"sheet":         table.Sheet,
-		"columns":       table.Headers,
-		"rows":          pageRows,
-		"page":          page,
-		"pageSize":      pageSize,
-		"total":         total,
-		"totalPages":    pages,
-		"filtered":      filter != "",
+		"sheet":      table.Sheet,
+		"columns":    table.Headers,
+		"rows":       pageRows,
+		"page":       page,
+		"pageSize":   pageSize,
+		"total":      total,
+		"totalPages": pages,
+		"filtered":   filter != "",
 	})
 }
 
@@ -577,20 +573,46 @@ func clampInt(v, lo, hi int) int {
 	return v
 }
 
+// columnType returns the inferred type of a column, using the cached analysis
+// when available. When the sheet has not been analysed yet the column is
+// inferred on demand so that sort order never depends on whether the client
+// happened to request the analysis first.
+func (s *Server) columnType(e *store.Entry, table *model.Table, idx int) model.ColumnType {
+	if a, ok := e.Analysis[table.Sheet]; ok && idx < len(a.Columns) {
+		return a.Columns[idx].Type
+	}
+	if idx < 0 || idx >= len(table.Headers) {
+		return ""
+	}
+	t, _, _ := analyzer.InferType(table.Headers[idx], table.Rows, idx)
+	return t
+}
+
 // sortRows sorts rows in place by column idx. Numeric and date-aware columns
 // sort by value; everything else sorts lexically.
-func sortRows(rows [][]string, idx int, order, colType string) {
+func sortRows(rows [][]string, idx int, order string, colType model.ColumnType) {
 	desc := order == "desc"
 	less := func(i, j int) bool {
 		a := cellValue(rows[i], idx)
 		b := cellValue(rows[j], idx)
 		switch colType {
-		case "integer", "float":
+		case model.TypeInteger, model.TypeFloat, model.TypeIDLike:
 			av, aok := numutil.ParseNumber(a)
 			bv, bok := numutil.ParseNumber(b)
 			switch {
 			case aok && bok:
 				return av < bv
+			case aok:
+				return true
+			case bok:
+				return false
+			}
+		case model.TypeDate, model.TypeDatetime:
+			at, _, aok := analyzer.ParseDate(a)
+			bt, _, bok := analyzer.ParseDate(b)
+			switch {
+			case aok && bok:
+				return at.Before(bt)
 			case aok:
 				return true
 			case bok:

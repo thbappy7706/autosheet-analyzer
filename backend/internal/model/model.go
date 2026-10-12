@@ -94,11 +94,11 @@ type NumericStats struct {
 
 // CategoricalStats holds stats for categorical/text columns.
 type CategoricalStats struct {
-	Top           []CategoryCount `json:"top"`
-	Cardinality   int             `json:"cardinality"`
-	AvgLength     float64         `json:"avgLength"`
-	MinLength     int             `json:"minLength"`
-	MaxLength     int             `json:"maxLength"`
+	Top         []CategoryCount `json:"top"`
+	Cardinality int             `json:"cardinality"`
+	AvgLength   float64         `json:"avgLength"`
+	MinLength   int             `json:"minLength"`
+	MaxLength   int             `json:"maxLength"`
 }
 
 // DateStats holds stats for date/datetime columns.
@@ -119,20 +119,20 @@ type BooleanStats struct {
 
 // ColumnProfile is the full profile for a single column.
 type ColumnProfile struct {
-	Name          string            `json:"name"`
-	Index         int               `json:"index"`
-	Type          ColumnType        `json:"type"`
-	Missing       int               `json:"missing"`
-	MissingPct    float64           `json:"missingPct"`
-	Unique        int               `json:"unique"`
-	UniquePct     float64           `json:"uniquePct"`
-	IsConstant    bool              `json:"isConstant"`
-	MixedTypes    bool              `json:"mixedTypes"`
-	Numeric       *NumericStats     `json:"numeric,omitempty"`
-	Categorical   *CategoricalStats `json:"categorical,omitempty"`
-	Date          *DateStats        `json:"date,omitempty"`
-	Boolean       *BooleanStats     `json:"boolean,omitempty"`
-	SuggestedChart string           `json:"suggestedChart"`
+	Name           string            `json:"name"`
+	Index          int               `json:"index"`
+	Type           ColumnType        `json:"type"`
+	Missing        int               `json:"missing"`
+	MissingPct     float64           `json:"missingPct"`
+	Unique         int               `json:"unique"`
+	UniquePct      float64           `json:"uniquePct"`
+	IsConstant     bool              `json:"isConstant"`
+	MixedTypes     bool              `json:"mixedTypes"`
+	Numeric        *NumericStats     `json:"numeric,omitempty"`
+	Categorical    *CategoricalStats `json:"categorical,omitempty"`
+	Date           *DateStats        `json:"date,omitempty"`
+	Boolean        *BooleanStats     `json:"boolean,omitempty"`
+	SuggestedChart string            `json:"suggestedChart"`
 }
 
 // CorrelationPair is a pair of numeric columns with their correlation.
@@ -162,10 +162,10 @@ type Insight struct {
 
 // Analysis is the complete analysis response.
 type Analysis struct {
-	Overview     Overview        `json:"overview"`
-	Columns      []ColumnProfile `json:"columns"`
-	Correlation  Correlation     `json:"correlation"`
-	Insights     []Insight       `json:"insights"`
-	GeneratedAt  time.Time       `json:"generatedAt"`
-	DurationMS   int64           `json:"durationMs"`
+	Overview    Overview        `json:"overview"`
+	Columns     []ColumnProfile `json:"columns"`
+	Correlation Correlation     `json:"correlation"`
+	Insights    []Insight       `json:"insights"`
+	GeneratedAt time.Time       `json:"generatedAt"`
+	DurationMS  int64           `json:"durationMs"`
 }

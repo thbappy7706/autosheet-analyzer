@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/example/excel-analyzer/internal/model"
+	"github.com/thbappy7706/autosheet-analyzer/backend/internal/model"
 	"github.com/xuri/excelize/v2"
 )
 

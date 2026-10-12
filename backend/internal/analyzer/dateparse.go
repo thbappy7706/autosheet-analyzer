@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/example/excel-analyzer/internal/numutil"
+	"github.com/thbappy7706/autosheet-analyzer/backend/internal/numutil"
 )
 
 // DateKind distinguishes date-only from datetime values.

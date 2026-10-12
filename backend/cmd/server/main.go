@@ -12,12 +12,21 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/example/excel-analyzer/internal/api"
+	"github.com/thbappy7706/autosheet-analyzer/backend/internal/api"
+	"github.com/thbappy7706/autosheet-analyzer/backend/internal/envload"
 )
 
 func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}))
 	slog.SetDefault(logger)
+
+	// Load a .env file if one is present. Values already exported in the
+	// environment take precedence, so this is safe to run unconditionally.
+	if path, n, err := envload.LoadDefault(); err != nil {
+		slog.Warn("could not read env file", "error", err)
+	} else if path != "" {
+		slog.Info("loaded env file", "path", path, "variables", n)
+	}
 
 	cfg := api.Config{
 		MaxUploadBytes: int64(envInt("MAX_UPLOAD_MB", 50)) << 20,

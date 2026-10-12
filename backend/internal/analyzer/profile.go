@@ -11,8 +11,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/example/excel-analyzer/internal/model"
-	"github.com/example/excel-analyzer/internal/numutil"
+	"github.com/thbappy7706/autosheet-analyzer/backend/internal/model"
+	"github.com/thbappy7706/autosheet-analyzer/backend/internal/numutil"
 )
 
 // Options controls how much of a table is profiled.
@@ -98,15 +98,15 @@ func ProfileTable(headers []string, rows [][]string, opts Options) model.Analysi
 
 func overview(headers []string, rows [][]string, opts Options, sampled bool) model.Overview {
 	ov := model.Overview{
-		Rows:           len(rows),
-		Columns:        len(headers),
-		FileSize:       opts.FileSize,
-		Sheet:          opts.Sheet,
-		Sampled:        sampled,
-		AnalyzedRows:   len(rows),
-		EmptyRows:      0,
-		DuplicateRows:  0,
-		EmptyColumns:   0,
+		Rows:            len(rows),
+		Columns:         len(headers),
+		FileSize:        opts.FileSize,
+		Sheet:           opts.Sheet,
+		Sampled:         sampled,
+		AnalyzedRows:    len(rows),
+		EmptyRows:       0,
+		DuplicateRows:   0,
+		EmptyColumns:    0,
 		TruncatedColumn: false,
 	}
 	if ov.Rows == 0 {

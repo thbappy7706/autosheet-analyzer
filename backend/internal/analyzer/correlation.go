@@ -4,7 +4,7 @@ import (
 	"math"
 	"sort"
 
-	"github.com/example/excel-analyzer/internal/model"
+	"github.com/thbappy7706/autosheet-analyzer/backend/internal/model"
 )
 
 // Pearson returns the Pearson correlation coefficient between x and y.
@@ -109,4 +109,3 @@ func topN(pairs []model.CorrelationPair, n int, keep func(model.CorrelationPair)
 	}
 	return out
 }
-

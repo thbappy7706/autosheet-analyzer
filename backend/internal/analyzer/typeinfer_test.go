@@ -3,7 +3,7 @@ package analyzer
 import (
 	"testing"
 
-	"github.com/example/excel-analyzer/internal/model"
+	"github.com/thbappy7706/autosheet-analyzer/backend/internal/model"
 )
 
 func col(values ...string) [][]string {
@@ -16,11 +16,11 @@ func col(values ...string) [][]string {
 
 func TestInferType(t *testing.T) {
 	cases := []struct {
-		name    string
-		header  string
-		values  []string
-		want    model.ColumnType
-		mixed   bool
+		name   string
+		header string
+		values []string
+		want   model.ColumnType
+		mixed  bool
 	}{
 		{"integers", "age", []string{"1", "2", "3", "40"}, model.TypeInteger, false},
 		{"floats", "price", []string{"1.5", "2.25", "3"}, model.TypeFloat, false},

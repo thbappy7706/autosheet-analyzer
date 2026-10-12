@@ -1,6 +1,6 @@
 package analyzer
 
-import "github.com/example/excel-analyzer/internal/model"
+import "github.com/thbappy7706/autosheet-analyzer/backend/internal/model"
 
 // Severity levels for insights.
 const (

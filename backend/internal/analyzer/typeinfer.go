@@ -6,8 +6,8 @@ import (
 	"math"
 	"strings"
 
-	"github.com/example/excel-analyzer/internal/model"
-	"github.com/example/excel-analyzer/internal/numutil"
+	"github.com/thbappy7706/autosheet-analyzer/backend/internal/model"
+	"github.com/thbappy7706/autosheet-analyzer/backend/internal/numutil"
 )
 
 // BoolValues maps textual booleans to their meaning.
@@ -22,18 +22,18 @@ var boolFalse = map[string]bool{
 
 // columnSample gathers the counts needed to infer a column's type.
 type columnSample struct {
-	total      int
-	missing    int
-	numeric    int
-	integer    int
-	boolean    int
-	date       int
-	datetime   int
-	unique     map[string]struct{}
-	minLen     int
-	maxLen     int
-	lenSum     int
-	lenCount   int
+	total    int
+	missing  int
+	numeric  int
+	integer  int
+	boolean  int
+	date     int
+	datetime int
+	unique   map[string]struct{}
+	minLen   int
+	maxLen   int
+	lenSum   int
+	lenCount int
 	// mixedKinds counts, for non-numeric value kinds, how many values fell
 	// outside the dominant kind.
 	numericNonParse int
