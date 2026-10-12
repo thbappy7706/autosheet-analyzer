@@ -20,5 +20,7 @@ export default defineConfig({
     globals: true,
     setupFiles: './src/test/setup.ts',
     css: false,
+    // Only unit tests; Playwright owns the e2e/ directory.
+    include: ['src/**/*.test.{ts,tsx}'],
   },
 })

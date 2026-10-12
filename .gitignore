@@ -1,3 +1,28 @@
 task.md
-frontend/node_modules
+
+# Environment / secrets
 .env
+.env.local
+
+# Go
+backend/server
+backend/server.exe
+backend/*.test
+backend/*.out
+
+# Node / frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/coverage/
+
+# Playwright
+frontend/test-results/
+frontend/playwright-report/
+frontend/.playwright/
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

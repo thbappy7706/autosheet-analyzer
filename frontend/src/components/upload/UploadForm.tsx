@@ -113,7 +113,10 @@ export function UploadForm() {
         accept=".csv,.tsv,.txt,.xlsx,.xlsm,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         onChange={(e) => {
           const file = e.target.files?.[0]
-          if (file) setSelectedName(file.name)
+          if (!file) return
+          setSelectedName(file.name)
+          // Selecting a file starts the analysis immediately.
+          e.currentTarget.form?.requestSubmit()
         }}
       />
 
