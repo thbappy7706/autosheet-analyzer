@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light dark;
+}
+
+body {
+  min-height: 100vh;
+  font-family: Inter, 'Hind Siliguri', system-ui, sans-serif;
+}
+
+/* Bangla needs a roomier line-height and its own font stack. */
+:lang(bn) body,
+body:lang(bn) {
+  font-family: 'Hind Siliguri', 'Noto Sans Bengali', system-ui, sans-serif;
+  line-height: 1.7;
+}
+
+:lang(bn) h1,
+:lang(bn) h2,
+:lang(bn) h3 {
+  line-height: 1.6;
+}
+
+/* Long Bangla/English labels should wrap instead of breaking the layout. */
+.break-anywhere {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+@media print {
+  .no-print {
+    display: none;
+  }
+}

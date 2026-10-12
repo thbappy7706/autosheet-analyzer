@@ -62,7 +62,7 @@ func BuildInsights(ov model.Overview, profiles []model.ColumnProfile, corr model
 				Column:   p.Name,
 				Params:   map[string]any{"column": p.Name},
 			})
-		} else if p.Unique == 2 && p.UniquePct < 80 {
+		} else if p.Unique == 2 && dominancePercent(p) >= 90 {
 			insights = append(insights, model.Insight{
 				Code:     "NEAR_CONSTANT",
 				Severity: SeverityInfo,
@@ -142,6 +142,26 @@ func BuildInsights(ov model.Overview, profiles []model.ColumnProfile, corr model
 	}
 
 	return insights
+}
+
+// dominancePercent returns how much the most common value dominates a column,
+// or 0 when the column has no categorical/boolean breakdown available.
+func dominancePercent(p model.ColumnProfile) float64 {
+	if p.Categorical != nil && len(p.Categorical.Top) > 0 {
+		return p.Categorical.Top[0].Pct
+	}
+	if p.Boolean != nil {
+		total := p.Boolean.True + p.Boolean.False
+		if total == 0 {
+			return 0
+		}
+		n := p.Boolean.True
+		if p.Boolean.False > n {
+			n = p.Boolean.False
+		}
+		return float64(n) / float64(total) * 100
+	}
+	return 0
 }
 
 func outlierPercent(ns *model.NumericStats) float64 {

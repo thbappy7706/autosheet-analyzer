@@ -1,0 +1,425 @@
+openapi: 3.0.3
+info:
+  title: AutoSheet Analyzer API
+  version: 1.0.0
+  description: |
+    Upload a CSV/TSV/Excel file and receive an automatic analysis: dataset
+    overview, per-column profiles, correlations, insights and paginated rows.
+
+    Responses are language-neutral. Insights and errors use stable machine
+    codes (`insight.code`, `error.code`) with parameters, and the frontend
+    renders the localized text.
+servers:
+  - url: http://localhost:8080
+    description: Local development
+tags:
+  - name: uploads
+  - name: health
+
+paths:
+  /healthz:
+    get:
+      tags: [health]
+      summary: Liveness probe
+      responses:
+        '200':
+          description: Service is up
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string, enum: [ok] }
+
+  /api/v1/uploads:
+    post:
+      tags: [uploads]
+      summary: Upload a CSV, TSV or Excel file
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                sheet:
+                  type: string
+                  description: Optional sheet to validate on upload
+      responses:
+        '201':
+          description: Upload stored
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Upload' }
+        '400': { $ref: '#/components/responses/Error' }
+        '413': { $ref: '#/components/responses/Error' }
+        '415': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+        '429': { $ref: '#/components/responses/Error' }
+
+  /api/v1/uploads/{id}:
+    parameters:
+      - $ref: '#/components/parameters/UploadId'
+    get:
+      tags: [uploads]
+      summary: Upload metadata
+      responses:
+        '200':
+          description: Upload metadata
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Upload' }
+        '404': { $ref: '#/components/responses/Error' }
+    delete:
+      tags: [uploads]
+      summary: Delete an upload and its cached analysis
+      responses:
+        '204': { description: Deleted }
+        '404': { $ref: '#/components/responses/Error' }
+
+  /api/v1/uploads/{id}/analysis:
+    parameters:
+      - $ref: '#/components/parameters/UploadId'
+      - $ref: '#/components/parameters/Sheet'
+    get:
+      tags: [uploads]
+      summary: Full analysis for a sheet
+      responses:
+        '200':
+          description: Analysis result
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Analysis' }
+        '404': { $ref: '#/components/responses/Error' }
+
+  /api/v1/uploads/{id}/rows:
+    parameters:
+      - $ref: '#/components/parameters/UploadId'
+      - $ref: '#/components/parameters/Sheet'
+      - name: page
+        in: query
+        schema: { type: integer, minimum: 1, default: 1 }
+      - name: pageSize
+        in: query
+        schema: { type: integer, minimum: 1, maximum: 1000, default: 100 }
+      - name: sort
+        in: query
+        description: Column name to sort by
+        schema: { type: string }
+      - name: order
+        in: query
+        schema: { type: string, enum: [asc, desc] }
+      - name: filter
+        in: query
+        description: Substring matched against every cell in a row
+        schema: { type: string }
+    get:
+      tags: [uploads]
+      summary: Paginated, sortable, filterable rows
+      responses:
+        '200':
+          description: One page of rows
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RowsPage' }
+        '400': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+
+  /api/v1/uploads/{id}/aggregate:
+    parameters:
+      - $ref: '#/components/parameters/UploadId'
+    post:
+      tags: [uploads]
+      summary: Aggregate a column grouped by another column
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AggregateRequest' }
+      responses:
+        '200':
+          description: Aggregated points
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AggregateResponse' }
+        '400': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+
+components:
+  parameters:
+    UploadId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string }
+    Sheet:
+      name: sheet
+      in: query
+      schema: { type: string }
+
+  responses:
+    Error:
+      description: Error response
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+
+  schemas:
+    ErrorEnvelope:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              enum:
+                - BAD_REQUEST
+                - NOT_FOUND
+                - FILE_TOO_LARGE
+                - UNSUPPORTED_MEDIA_TYPE
+                - MISSING_FILE
+                - PARSE_FAILED
+                - SHEET_NOT_FOUND
+                - RATE_LIMITED
+                - INTERNAL_ERROR
+                - PAYLOAD_INVALID
+            message: { type: string }
+            params:
+              type: object
+              additionalProperties: true
+
+    Upload:
+      type: object
+      required: [id, filename, size, sheets, createdAt]
+      properties:
+        id: { type: string }
+        filename: { type: string }
+        size: { type: integer, format: int64 }
+        sheets:
+          type: array
+          items: { type: string }
+        createdAt: { type: string, format: date-time }
+
+    ColumnType:
+      type: string
+      enum: [integer, float, boolean, date, datetime, categorical, text, id-like, constant]
+
+    Overview:
+      type: object
+      required:
+        [rows, columns, fileSize, sheet, memoryEstimate, duplicateRows, emptyRows,
+         emptyColumns, missingCells, missingPercent, sampled, analyzedRows, qualityScore]
+      properties:
+        rows: { type: integer }
+        columns: { type: integer }
+        fileSize: { type: integer, format: int64 }
+        sheet: { type: string }
+        memoryEstimate: { type: integer, format: int64 }
+        duplicateRows: { type: integer }
+        emptyRows: { type: integer }
+        emptyColumns: { type: integer }
+        missingCells: { type: integer }
+        missingPercent: { type: number, format: double }
+        sampled: { type: boolean }
+        analyzedRows: { type: integer }
+        qualityScore: { type: integer, minimum: 0, maximum: 100 }
+        truncatedColumns: { type: boolean }
+
+    HistogramBin:
+      type: object
+      properties:
+        from: { type: number }
+        to: { type: number }
+        count: { type: integer }
+
+    CategoryCount:
+      type: object
+      properties:
+        value: { type: string }
+        count: { type: integer }
+        pct: { type: number }
+
+    TimeBucket:
+      type: object
+      properties:
+        period: { type: string }
+        count: { type: integer }
+
+    NumericStats:
+      type: object
+      properties:
+        min: { type: number }
+        max: { type: number }
+        mean: { type: number }
+        median: { type: number }
+        mode: { type: number }
+        stdDev: { type: number }
+        variance: { type: number }
+        q1: { type: number }
+        q3: { type: number }
+        iqr: { type: number }
+        skewness: { type: number }
+        kurtosis: { type: number }
+        sum: { type: number }
+        outlierCount: { type: integer }
+        histogram:
+          type: array
+          items: { $ref: '#/components/schemas/HistogramBin' }
+
+    CategoricalStats:
+      type: object
+      properties:
+        top:
+          type: array
+          items: { $ref: '#/components/schemas/CategoryCount' }
+        cardinality: { type: integer }
+        avgLength: { type: number }
+        minLength: { type: integer }
+        maxLength: { type: integer }
+
+    DateStats:
+      type: object
+      properties:
+        min: { type: string }
+        max: { type: string }
+        rangeDays: { type: integer }
+        frequency: { type: string }
+        byYear:
+          type: array
+          items: { $ref: '#/components/schemas/TimeBucket' }
+        byMonth:
+          type: array
+          items: { $ref: '#/components/schemas/TimeBucket' }
+
+    BooleanStats:
+      type: object
+      properties:
+        true: { type: integer }
+        false: { type: integer }
+
+    ColumnProfile:
+      type: object
+      required: [name, index, type, missing, missingPct, unique, uniquePct, isConstant, mixedTypes, suggestedChart]
+      properties:
+        name: { type: string }
+        index: { type: integer }
+        type: { $ref: '#/components/schemas/ColumnType' }
+        missing: { type: integer }
+        missingPct: { type: number }
+        unique: { type: integer }
+        uniquePct: { type: number }
+        isConstant: { type: boolean }
+        mixedTypes: { type: boolean }
+        numeric: { $ref: '#/components/schemas/NumericStats' }
+        categorical: { $ref: '#/components/schemas/CategoricalStats' }
+        date: { $ref: '#/components/schemas/DateStats' }
+        boolean: { $ref: '#/components/schemas/BooleanStats' }
+        suggestedChart: { type: string }
+
+    CorrelationPair:
+      type: object
+      properties:
+        a: { type: string }
+        b: { type: string }
+        r: { type: number }
+
+    Correlation:
+      type: object
+      properties:
+        columns:
+          type: array
+          items: { type: string }
+        matrix:
+          type: array
+          items:
+            type: array
+            items: { type: number }
+        topPositive:
+          type: array
+          items: { $ref: '#/components/schemas/CorrelationPair' }
+        topNegative:
+          type: array
+          items: { $ref: '#/components/schemas/CorrelationPair' }
+        highPairs:
+          type: array
+          items: { $ref: '#/components/schemas/CorrelationPair' }
+
+    Insight:
+      type: object
+      required: [code, severity]
+      properties:
+        code: { type: string }
+        severity: { type: string, enum: [info, warning] }
+        column: { type: string }
+        params:
+          type: object
+          additionalProperties: true
+
+    Analysis:
+      type: object
+      required: [overview, columns, correlation, generatedAt, durationMs]
+      properties:
+        overview: { $ref: '#/components/schemas/Overview' }
+        columns:
+          type: array
+          items: { $ref: '#/components/schemas/ColumnProfile' }
+        correlation: { $ref: '#/components/schemas/Correlation' }
+        insights:
+          type: array
+          items: { $ref: '#/components/schemas/Insight' }
+        generatedAt: { type: string, format: date-time }
+        durationMs: { type: integer, format: int64 }
+
+    RowsPage:
+      type: object
+      required: [sheet, columns, rows, page, pageSize, total, totalPages]
+      properties:
+        sheet: { type: string }
+        columns:
+          type: array
+          items: { type: string }
+        rows:
+          type: array
+          items:
+            type: array
+            items: { type: string }
+        page: { type: integer }
+        pageSize: { type: integer }
+        total: { type: integer }
+        totalPages: { type: integer }
+        filtered: { type: boolean }
+
+    AggregateRequest:
+      type: object
+      required: [x, agg]
+      properties:
+        sheet: { type: string }
+        x: { type: string }
+        y: { type: string }
+        agg: { type: string, enum: [sum, avg, count, min, max] }
+        groupBy: { type: string }
+
+    AggregatePoint:
+      type: object
+      properties:
+        label: { type: string }
+        value: { type: number }
+        count: { type: integer }
+
+    AggregateResponse:
+      type: object
+      properties:
+        sheet: { type: string }
+        x: { type: string }
+        y: { type: string }
+        agg: { type: string }
+        points:
+          type: array
+          items: { $ref: '#/components/schemas/AggregatePoint' }

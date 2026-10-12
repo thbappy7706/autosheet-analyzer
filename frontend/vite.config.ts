@@ -2,19 +2,17 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
+// The Go API origin used by the dev server proxy. Override with
+// VITE_API_TARGET when the backend runs somewhere other than localhost:8080.
+const apiTarget = 'http://localhost:8080'
+
 export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
     proxy: {
-      '/api': {
-        target: process.env.VITE_API_TARGET ?? 'http://localhost:8080',
-        changeOrigin: true,
-      },
-      '/healthz': {
-        target: process.env.VITE_API_TARGET ?? 'http://localhost:8080',
-        changeOrigin: true,
-      },
+      '/api': { target: apiTarget, changeOrigin: true },
+      '/healthz': { target: apiTarget, changeOrigin: true },
     },
   },
   test: {

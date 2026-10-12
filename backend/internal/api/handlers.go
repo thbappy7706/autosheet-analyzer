@@ -112,10 +112,11 @@ func (s *Server) handleUpload(w http.ResponseWriter, r *http.Request) {
 
 	id := newID()
 	up := model.Upload{
-		ID:       id,
-		Filename: filename,
-		Size:     int64(len(raw)),
-		Sheets:   sheets,
+		ID:        id,
+		Filename:  filename,
+		Size:      int64(len(raw)),
+		Sheets:    sheets,
+		CreatedAt: time.Now().UTC(),
 	}
 	e := s.store.Create(up, path)
 	for name, t := range tables {
