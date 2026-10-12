@@ -127,7 +127,7 @@ func InferType(name string, rows [][]string, idx int) (model.ColumnType, columnS
 		return model.TypeConstant, s, false
 	case isIDLikeName(name) && unique == nonMissing && nonMissing > 1:
 		return model.TypeIDLike, s, false
-	case float64(unique)/float64(nonMissing) < 0.5 && unique <= 100:
+	case float64(unique)/float64(nonMissing) <= 0.5 && unique <= 100:
 		return model.TypeCategorical, s, false
 	default:
 		return model.TypeText, s, false

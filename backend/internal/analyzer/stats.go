@@ -45,11 +45,14 @@ func DescribeNumeric(vals []float64, bins int) model.NumericStats {
 	}
 	st.StdDev = math.Sqrt(st.Variance)
 
-	// Skewness and excess kurtosis (moment based, population moments).
-	if st.StdDev > 0 {
+	// Skewness and excess kurtosis use population moments (matching NumPy /
+	// SciPy defaults), so the population standard deviation is used here
+	// rather than the sample one reported above.
+	popStd := math.Sqrt(ss / float64(n))
+	if popStd > 0 {
 		var m3, m4 float64
 		for _, v := range sorted {
-			z := (v - st.Mean) / st.StdDev
+			z := (v - st.Mean) / popStd
 			m3 += z * z * z
 			m4 += z * z * z * z
 		}

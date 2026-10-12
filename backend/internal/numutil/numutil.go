@@ -16,40 +16,43 @@ var banglaDigits = map[rune]rune{
 	'৫': '5', '৬': '6', '৭': '7', '৮': '8', '৯': '9',
 }
 
-// NormalizeDigits converts Bangla (and Devanagari/Arabic-Indic) digits in s to
-// ASCII digits, leaving other characters untouched.
+// NormalizeDigits converts Bangla (and Arabic-Indic) digits in s to ASCII
+// digits, leaving other characters untouched.
 func NormalizeDigits(s string) string {
-	if !strings.ContainsFunc(s, isNonASCIIDigit) {
-		return s
-	}
 	var sb strings.Builder
+	changed := false
 	for _, r := range s {
 		if ascii, ok := banglaDigits[r]; ok {
 			sb.WriteRune(ascii)
+			changed = true
 			continue
 		}
 		switch {
 		case r >= 0x0660 && r <= 0x0669: // Arabic-Indic
 			sb.WriteRune('0' + (r - 0x0660))
+			changed = true
 		case r >= 0x06F0 && r <= 0x06F9: // Extended Arabic-Indic
 			sb.WriteRune('0' + (r - 0x06F0))
+			changed = true
 		default:
 			sb.WriteRune(r)
 		}
 	}
+	if !changed {
+		return s
+	}
 	return sb.String()
 }
 
-func isNonASCIIDigit(r rune) bool {
-	if r > unicode.MaxASCII {
-		return true
-	}
-	return false
-}
-
-// ParseNumber attempts to interpret s as a number. It strips surrounding
-// whitespace and known missing markers, currency symbols, thousands
-// separators and a trailing percent sign (divided by 100).
+// ParseNumber attempts to interpret s as a number.
+//
+// It tolerates surrounding whitespace, a leading currency symbol or 3-letter
+// currency code, thousands separators (comma, space, NBSP, apostrophe),
+// accounting parentheses and a trailing percent sign (divided by 100).
+//
+// It deliberately rejects strings containing letters or internal signs so
+// that dates ("2024-01-05"), ranges ("1-2") and free text are not misread as
+// numbers.
 func ParseNumber(s string) (float64, bool) {
 	s = strings.TrimSpace(s)
 	if s == "" || IsMissing(s) {
@@ -57,46 +60,48 @@ func ParseNumber(s string) (float64, bool) {
 	}
 	s = NormalizeDigits(s)
 
-	// Accounting style negatives.
 	neg := false
 	if strings.HasPrefix(s, "(") && strings.HasSuffix(s, ")") {
 		neg = true
-		s = strings.TrimSuffix(strings.TrimPrefix(s, "("), ")")
+		s = strings.TrimSpace(strings.TrimSuffix(strings.TrimPrefix(s, "("), ")"))
 	}
 
-	// Percentages.
 	percent := false
 	if strings.HasSuffix(s, "%") {
 		percent = true
-		s = strings.TrimSuffix(s, "%")
+		s = strings.TrimSpace(strings.TrimSuffix(s, "%"))
+	}
+
+	s = stripLeadingCurrencyCode(s)
+	s = strings.TrimSpace(s)
+	if strings.HasPrefix(s, "+") {
+		s = s[1:]
+	} else if strings.HasPrefix(s, "-") {
+		neg = !neg
+		s = s[1:]
 	}
 
 	var sb strings.Builder
-	exponent := false
-	for i, r := range s {
+	for _, r := range s {
 		switch {
 		case r >= '0' && r <= '9':
 			sb.WriteRune(r)
 		case r == '.' || r == ',':
 			sb.WriteRune(r)
-		case r == '-' && i == 0:
-			sb.WriteRune(r)
-		case r == '+' && i == 0:
-			// ignore leading plus
-		case r == 'e' || r == 'E':
-			exponent = true
-			sb.WriteRune(r)
-		case r == '-' || r == '+' && exponent:
-			sb.WriteRune(r)
+		case r == ' ' || r == '\u00A0' || r == '\'' || r == '\u2019':
+			// thousands separators; dropped below
+		case r == '+' || r == '-':
+			// A sign inside the number means this is not a plain number.
+			return 0, false
+		case unicode.IsSymbol(r) || unicode.IsCurrency(r):
+			// Currency symbols (e.g. $, €, ₹, ৳) are ignored.
 		default:
-			// Currency symbols, spaces, thousand separators like NBSP or
-			// apostrophe are simply dropped.
-			continue
+			return 0, false
 		}
 	}
 
 	cleaned := sb.String()
-	if cleaned == "" || cleaned == "-" || cleaned == "." {
+	if cleaned == "" || cleaned == "." || cleaned == "-" {
 		return 0, false
 	}
 	cleaned = normalizeSeparators(cleaned)
@@ -113,6 +118,28 @@ func ParseNumber(s string) (float64, bool) {
 	return v, true
 }
 
+// stripLeadingCurrencyCode removes a leading ISO currency code such as "USD"
+// or "BDT" (up to three letters) followed by optional whitespace.
+func stripLeadingCurrencyCode(s string) string {
+	runes := []rune(s)
+	n := 0
+	for n < len(runes) && unicode.IsLetter(runes[n]) && n < 4 {
+		n++
+	}
+	if n == 0 || n > 3 {
+		return s
+	}
+	// Only strip when a digit follows the code.
+	i := n
+	for i < len(runes) && (runes[i] == ' ' || runes[i] == '\u00A0') {
+		i++
+	}
+	if i < len(runes) && runes[i] >= '0' && runes[i] <= '9' {
+		return string(runes[i:])
+	}
+	return s
+}
+
 // normalizeSeparators resolves whether "," is a decimal or thousands
 // separator. When both are present the last one wins as the decimal mark.
 func normalizeSeparators(s string) string {
@@ -124,7 +151,8 @@ func normalizeSeparators(s string) string {
 	case lastDot == -1:
 		// No dot: a comma is a decimal mark only if a single comma is
 		// followed by 1-2 digits (e.g. "3,14"); otherwise thousands.
-		if strings.Count(s, ",") == 1 && len(s)-lastComma-1 <= 2 && len(s)-lastComma-1 >= 1 {
+		tail := len(s) - lastComma - 1
+		if strings.Count(s, ",") == 1 && tail >= 1 && tail <= 2 {
 			return strings.Replace(s, ",", ".", 1)
 		}
 		return strings.ReplaceAll(s, ",", "")

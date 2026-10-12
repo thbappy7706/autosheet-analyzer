@@ -1,0 +1,6 @@
+id,name,age,score,joined,active
+1,Alice,30,88.5,2024-01-05,true
+2,Bob,25,92.0,2024-02-10,false
+3,Carol,41,75.25,2023-12-01,true
+4,Dave,35,60.0,2024-03-15,true
+5,Erin,29,99.9,2024-04-20,false
