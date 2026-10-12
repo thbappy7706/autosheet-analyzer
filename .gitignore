@@ -26,3 +26,6 @@ frontend/.playwright/
 .vscode/
 .DS_Store
 Thumbs.db
+
+skills-lock.json
+.agents
