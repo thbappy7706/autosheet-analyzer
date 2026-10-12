@@ -93,16 +93,23 @@ func (w *ExcelWorkbook) Table(sheet string) (*model.Table, error) {
 	}
 
 	// Expand merged ranges so every covered cell carries the merged value.
+	// First grow the grid to cover every merged range, then fill values.
 	merged, _ := w.file.GetMergeCells(sheet)
 	for _, m := range merged {
 		x1, y1, x2, y2, err := parseRange(m.GetStartAxis(), m.GetEndAxis())
 		if err != nil {
 			continue
 		}
+		for len(rows) < y2 {
+			rows = append(rows, nil)
+		}
 		val := m.GetCellValue()
 		for r := y1; r <= y2; r++ {
+			for len(rows[r-1]) < x2 {
+				rows[r-1] = append(rows[r-1], "")
+			}
 			for c := x1; c <= x2; c++ {
-				setCell(rows, r-1, c-1, val)
+				rows[r-1][c-1] = val
 			}
 		}
 	}
@@ -135,20 +142,6 @@ func padRow(row []string, n int) []string {
 	out := make([]string, n)
 	copy(out, row)
 	return out
-}
-
-func setCell(rows [][]string, r, c int, v string) {
-	for len(rows) <= r {
-		rows = append(rows, nil)
-		// Reassign through the caller's slice is not possible here, so we
-		// grow in place by returning; handled by index growth below.
-	}
-	if r < len(rows) {
-		for len(rows[r]) <= c {
-			rows[r] = append(rows[r], "")
-		}
-		rows[r][c] = v
-	}
 }
 
 // parseRange parses axes like "A1" and "C4" into 1-based column/row numbers.
