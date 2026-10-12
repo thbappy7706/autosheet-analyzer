@@ -66,7 +66,7 @@ export function DashboardPage() {
       </div>
 
       {sheets.length > 1 ? (
-        <div role="tablist" className="tabs tabs-boxed w-fit max-w-full overflow-x-auto">
+        <div role="tablist" className="tabs tabs-box w-fit max-w-full overflow-x-auto">
           {sheets.map((s) => (
             <button
               key={s}
@@ -82,14 +82,14 @@ export function DashboardPage() {
         </div>
       ) : null}
 
-      <div role="tablist" className="tabs tabs-border overflow-x-auto">
+      <div role="tablist" className="tabs tabs-box overflow-x-auto">
         {TABS.map((tab) => (
           <Link
             key={tab}
             role="tab"
             to={`/d/${id}/${tab}?sheet=${encodeURIComponent(sheet)}`}
             aria-selected={tab === activeTab}
-            className={`tab whitespace-nowrap ${tab === activeTab ? 'tab-active font-medium' : ''}`}
+            className={`tab whitespace-nowrap ${tab === activeTab ? 'tab-active font-semibold' : ''}`}
           >
             {t(`nav.${tab}`)}
           </Link>

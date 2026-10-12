@@ -105,7 +105,7 @@ export function ExportTab({ id, analysis, filename }: { id: string; analysis: An
           <h2 className="card-title text-base">{t('download')} CSV</h2>
           <input
             type="text"
-            className="input input-sm input-bordered"
+            className="input input-sm"
             placeholder={tTable('searchPlaceholder')}
             value={filter}
             onChange={(e) => setFilter(e.target.value)}

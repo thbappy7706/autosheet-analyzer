@@ -31,7 +31,7 @@ export function ChartCard({ title, subtitle, children, height = 280, actions }: 
   }
 
   return (
-    <div className={`card bg-base-100 shadow-sm border border-base-300 ${fullscreen ? 'fixed inset-4 z-50 overflow-auto' : ''}`}>
+    <div className={`card bg-base-100 shadow-xs border border-base-300 ${fullscreen ? 'fixed inset-4 z-50 overflow-auto' : ''}`}>
       <div className="card-body p-4">
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div className="min-w-0">

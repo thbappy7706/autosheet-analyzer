@@ -1,20 +1,23 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-:root {
-  color-scheme: light dark;
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark, cupcake;
+}
+
+@theme {
+  --font-sans: 'Inter', 'Hind Siliguri', system-ui, sans-serif;
+  --font-bangla: 'Hind Siliguri', 'Noto Sans Bengali', system-ui, sans-serif;
 }
 
 body {
   min-height: 100vh;
-  font-family: Inter, 'Hind Siliguri', system-ui, sans-serif;
+  font-family: var(--font-sans);
 }
 
 /* Bangla needs a roomier line-height and its own font stack. */
 :lang(bn) body,
 body:lang(bn) {
-  font-family: 'Hind Siliguri', 'Noto Sans Bengali', system-ui, sans-serif;
+  font-family: var(--font-bangla);
   line-height: 1.7;
 }
 
@@ -22,6 +25,14 @@ body:lang(bn) {
 :lang(bn) h2,
 :lang(bn) h3 {
   line-height: 1.6;
+}
+
+/* Selected menu tab: a filled primary pill. daisyUI 5's tabs-box only tints the
+   active tab with base-100, which reads like plain text on a light surface. */
+.tabs-box > .tab.tab-active,
+.tabs-box > .tab[aria-selected='true'] {
+  --tab-bg: var(--color-primary);
+  color: var(--color-primary-content);
 }
 
 /* Long Bangla/English labels should wrap instead of breaking the layout. */
