@@ -101,10 +101,15 @@ func fileExt(name string) string {
 //   - drops fully empty columns and rows
 //   - renames blank and duplicate headers
 func NormalizeTable(sheet string, headers []string, rows [][]string) *model.Table {
+	// The header row defines the width when present; otherwise the widest
+	// data row does. Rows wider than the width are truncated, short rows are
+	// padded, so every row ends up the same length.
 	width := len(headers)
-	for _, r := range rows {
-		if len(r) > width {
-			width = len(r)
+	if width == 0 {
+		for _, r := range rows {
+			if len(r) > width {
+				width = len(r)
+			}
 		}
 	}
 	// Drop trailing columns that are entirely empty across headers and rows.

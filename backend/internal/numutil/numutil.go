@@ -93,7 +93,7 @@ func ParseNumber(s string) (float64, bool) {
 		case r == '+' || r == '-':
 			// A sign inside the number means this is not a plain number.
 			return 0, false
-		case unicode.IsSymbol(r) || unicode.IsCurrency(r):
+		case unicode.IsSymbol(r) || unicode.In(r, unicode.Sc):
 			// Currency symbols (e.g. $, €, ₹, ৳) are ignored.
 		default:
 			return 0, false
