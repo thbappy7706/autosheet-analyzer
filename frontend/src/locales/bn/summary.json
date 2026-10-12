@@ -1,0 +1,25 @@
+{
+  "title": "ডেটাসেট সারসংক্ষেপ",
+  "rows": "সারি",
+  "columns": "কলাম",
+  "missing": "অনুপস্থিত সেল",
+  "duplicates": "ডুপ্লিকেট সারি",
+  "quality": "ডেটার গুণমান",
+  "fileSize": "ফাইলের আকার",
+  "memory": "আনুমানিক মেমরি",
+  "sheet": "শিট",
+  "insights": "পর্যবেক্ষণ",
+  "noInsights": "কোনো সমস্যা পাওয়া যায়নি — আপনার ডেটা পরিষ্কার।",
+  "sampledNotice": "ফাইলটি বড়; {{rows}} সারির মধ্যে {{analyzedRows}} সারিতে পরিসংখ্যান গণনা করা হয়েছে।",
+  "severity": {
+    "info": "তথ্য",
+    "warning": "সতর্কতা"
+  },
+  "qualityGreat": "চমৎকার",
+  "qualityGood": "ভালো",
+  "qualityFair": "মাঝারি",
+  "qualityPoor": "দুর্বল",
+  "analysisTime": "{{ms}} মিলিসেকেন্ডে বিশ্লেষণ সম্পন্ন",
+  "emptyRows": "খালি সারি",
+  "emptyColumns": "খালি কলাম"
+}

@@ -1,0 +1,16 @@
+{
+  "BAD_REQUEST": "The request was invalid.",
+  "NOT_FOUND": "That upload was not found or has expired. Please upload the file again.",
+  "FILE_TOO_LARGE": "The file is larger than the {{size}} MB limit.",
+  "UNSUPPORTED_MEDIA_TYPE": "That file type is not supported. Upload a CSV, TSV or Excel file.",
+  "MISSING_FILE": "No file was selected.",
+  "PARSE_FAILED": "The file could not be parsed. Check that it is a valid CSV or Excel file.",
+  "SHEET_NOT_FOUND": "That sheet could not be found in the workbook.",
+  "RATE_LIMITED": "Too many requests. Please wait a moment and try again.",
+  "INTERNAL_ERROR": "Something went wrong on the server.",
+  "PAYLOAD_INVALID": "The request payload was invalid.",
+  "NETWORK_ERROR": "Could not reach the server.",
+  "ABORTED": "The upload was cancelled.",
+  "unknown": "An unexpected error occurred.",
+  "withCode": "{{message}} ({{code}})"
+}

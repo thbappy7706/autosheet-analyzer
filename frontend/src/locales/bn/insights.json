@@ -1,0 +1,16 @@
+{
+  "HIGH_MISSING": "{{column}} কলামের {{percent}}% সারিতে মান অনুপস্থিত।",
+  "CONSTANT_COLUMN": "{{column}} কলামে প্রতিটি সারিতে একই মান আছে।",
+  "NEAR_CONSTANT": "{{column}} কলামে মাত্র {{unique}}টি আলাদা মান আছে।",
+  "LIKELY_ID": "{{column}} একটি আইডেন্টিফায়ার কলাম বলে মনে হচ্ছে।",
+  "HIGH_CARDINALITY": "{{column}} কলামে অনেক বেশি স্বতন্ত্র মান ({{unique}}টি)।",
+  "OUTLIERS": "{{column}} কলামে {{count}}টি বহির্ভূত মান আছে ({{percent}}%)।",
+  "HEAVY_SKEW": "{{column}} কলামের বণ্টন তীব্রভাবে বক্র (স্কিউনেস {{skewness}})।",
+  "DUPLICATE_ROWS": "{{count}}টি ডুপ্লিকেট সারি পাওয়া গেছে ({{percent}}%)।",
+  "MIXED_TYPES": "{{column}} কলামে বিভিন্ন ধরনের মান মিশ্রিত।",
+  "EMPTY_COLUMNS": "{{count}}টি কলাম সম্পূর্ণ খালি।",
+  "SAMPLED": "{{rows}} সারির মধ্যে {{analyzedRows}}টি সারির নমুনা দিয়ে বিশ্লেষণ করা হয়েছে।",
+  "FEW_NUMERIC": "মাত্র {{count}}টি সংখ্যাসূচক কলাম — সহসম্পর্ক ও চার্ট সীমিত।",
+  "HIGH_CORRELATION": "{{a}} ও {{b}} এর মধ্যে শক্তিশালী সহসম্পর্ক আছে (r = {{r}})।",
+  "SUGGESTED_CHART": "{{column}} কলামের জন্য একটি {{chart}} চার্ট চেষ্টা করুন।"
+}

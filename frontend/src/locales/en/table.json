@@ -1,0 +1,13 @@
+{
+  "title": "Data preview",
+  "searchPlaceholder": "Search all rows…",
+  "filtered": "Filtered",
+  "noResults": "No rows match your search.",
+  "loading": "Loading rows…",
+  "pageSize": "Rows per page",
+  "previous": "Previous",
+  "next": "Next",
+  "sortAscending": "Sort ascending",
+  "sortDescending": "Sort descending",
+  "emptyState": "Upload a file to preview its rows."
+}

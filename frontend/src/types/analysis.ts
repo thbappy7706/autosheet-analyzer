@@ -152,7 +152,9 @@ export interface RowsPage {
   total: number
   totalPages: number
   filtered: boolean
-}export interface AggregateRequest {
+}export type Aggregation = 'sum' | 'avg' | 'count' | 'min' | 'max'
+
+export interface AggregateRequest {
   sheet?: string
   x: string
   y?: string

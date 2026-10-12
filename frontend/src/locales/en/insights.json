@@ -1,0 +1,16 @@
+{
+  "HIGH_MISSING": "{{column}} is missing in {{percent}}% of rows.",
+  "CONSTANT_COLUMN": "{{column}} has the same value in every row.",
+  "NEAR_CONSTANT": "{{column}} has only {{unique}} distinct values.",
+  "LIKELY_ID": "{{column}} looks like an identifier column.",
+  "HIGH_CARDINALITY": "{{column}} has high cardinality ({{unique}} unique values).",
+  "OUTLIERS": "{{column}} contains {{count}} outliers ({{percent}}%).",
+  "HEAVY_SKEW": "{{column}} is heavily skewed (skewness {{skewness}}).",
+  "DUPLICATE_ROWS": "Found {{count}} duplicate rows ({{percent}}%).",
+  "MIXED_TYPES": "{{column}} mixes different value types.",
+  "EMPTY_COLUMNS": "{{count}} column(s) are completely empty.",
+  "SAMPLED": "Analysis used a sample of {{analyzedRows}} of {{rows}} rows.",
+  "FEW_NUMERIC": "Only {{count}} numeric column(s) — correlations and charts are limited.",
+  "HIGH_CORRELATION": "{{a}} and {{b}} are strongly correlated (r = {{r}}).",
+  "SUGGESTED_CHART": "Try a {{chart}} chart for {{column}}."
+}

@@ -1,0 +1,17 @@
+{
+  "title": "Upload your data",
+  "subtitle": "Drop a CSV, TSV or Excel file. Analysis starts automatically — no configuration needed.",
+  "dropzone": "Drag & drop your file here, or",
+  "browse": "browse files",
+  "dropHere": "Release to upload",
+  "supported": "Supported: .csv, .tsv, .xlsx, .xlsm",
+  "maxSize": "Maximum size: {{size}} MB",
+  "uploading": "Uploading… {{percent}}%",
+  "processing": "Analyzing your data…",
+  "analyzingProgress": "Profiling columns and computing statistics",
+  "cancelUpload": "Cancel upload",
+  "chooseSheet": "This workbook has multiple sheets",
+  "chooseSheetHelp": "Pick the sheet you want to analyse.",
+  "startOver": "Analyze another file",
+  "fileSize": "File size"
+}

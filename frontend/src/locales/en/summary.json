@@ -1,0 +1,25 @@
+{
+  "title": "Dataset summary",
+  "rows": "Rows",
+  "columns": "Columns",
+  "missing": "Missing cells",
+  "duplicates": "Duplicate rows",
+  "quality": "Data quality",
+  "fileSize": "File size",
+  "memory": "Estimated memory",
+  "sheet": "Sheet",
+  "insights": "Insights",
+  "noInsights": "No issues detected — your data looks clean.",
+  "sampledNotice": "This file is large; statistics were computed on {{analyzedRows}} of {{rows}} rows.",
+  "severity": {
+    "info": "Info",
+    "warning": "Warning"
+  },
+  "qualityGreat": "Great",
+  "qualityGood": "Good",
+  "qualityFair": "Fair",
+  "qualityPoor": "Poor",
+  "analysisTime": "Analyzed in {{ms}} ms",
+  "emptyRows": "Empty rows",
+  "emptyColumns": "Empty columns"
+}
