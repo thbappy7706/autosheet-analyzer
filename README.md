@@ -7,6 +7,8 @@ on the fly.
 
 The entire UI is available in **English** and **Bangla**, switchable at runtime.
 
+![AutoSheet Analyzer](frontend/screen.png)
+
 ---
 
 ## Quick start (local, no Docker)
