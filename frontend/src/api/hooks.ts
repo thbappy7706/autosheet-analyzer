@@ -40,7 +40,7 @@ export function useRows(id: string, params: RowsParams) {
     queryKey: queryKeys.rows(id, { ...params }),
     queryFn: () =>
       api.getRows(id, {
-        sheet: params.sheet,
+        sheet: params.sheet || undefined,
         page: params.page,
         pageSize: params.pageSize,
         sort: params.sort,
@@ -49,7 +49,7 @@ export function useRows(id: string, params: RowsParams) {
       }),
     // Keep the previous page visible while the next one loads.
     placeholderData: (prev) => prev,
-    enabled: Boolean(id) && Boolean(params.sheet),
+    enabled: Boolean(id),
   })
 }
 

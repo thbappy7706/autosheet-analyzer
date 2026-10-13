@@ -43,10 +43,7 @@ export function ChartsTab({ id, sheet, analysis }: { id: string; sheet: string; 
   return (
     <div className="space-y-4">
       <section className="space-y-3">
-        <div className="flex items-center gap-2">
-          <h2 className="text-xs font-bold uppercase tracking-wider opacity-60">{t('gallery')}</h2>
-          <span className="badge badge-primary badge-soft badge-xs">Automated Plots</span>
-        </div>
+        <h2 className="text-xs font-bold uppercase tracking-wider opacity-60">{t('gallery')}</h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {numeric.slice(0, 8).map((column) => (
             <ChartCard
@@ -95,10 +92,7 @@ export function ChartsTab({ id, sheet, analysis }: { id: string; sheet: string; 
 
       {numeric.length > 0 ? (
         <section className="space-y-3">
-          <div className="flex items-center gap-2">
-            <h2 className="text-xs font-bold uppercase tracking-wider opacity-60">{tColumns('outliers')}</h2>
-            <span className="badge badge-warning badge-soft badge-xs">Anomaly Detection</span>
-          </div>
+          <h2 className="text-xs font-bold uppercase tracking-wider opacity-60">{tColumns('outliers')}</h2>
           <ChartCard title={tColumns('outliers')} subtitle={tColumns('stats')}>
             <OutlierChart columns={numeric} />
           </ChartCard>
@@ -107,10 +101,7 @@ export function ChartsTab({ id, sheet, analysis }: { id: string; sheet: string; 
 
       {analysis.correlation.columns.length >= 2 ? (
         <section className="space-y-3">
-          <div className="flex items-center gap-2">
-            <h2 className="text-xs font-bold uppercase tracking-wider opacity-60">{t('correlation')}</h2>
-            <span className="badge badge-secondary badge-soft badge-xs">Pearson r</span>
-          </div>
+          <h2 className="text-xs font-bold uppercase tracking-wider opacity-60">{t('correlation')}</h2>
           <ChartCard title={t('heatmap')} subtitle={t('correlation')} height={Math.max(240, analysis.correlation.columns.length * 34)}>
             <CorrelationHeatmap correlation={analysis.correlation} />
           </ChartCard>

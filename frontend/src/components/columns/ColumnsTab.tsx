@@ -41,7 +41,9 @@ export function ColumnsTab({ columns }: { columns: ColumnProfile[] }) {
               onClick={() => setQuery('')}
               aria-label="Clear filter"
             >
-              ✕
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path d="M18 6 6 18M6 6l12 12" />
+              </svg>
             </button>
           ) : null}
         </label>
@@ -74,7 +76,7 @@ function ColumnCard({ column }: { column: ColumnProfile }) {
         <div className="flex flex-wrap items-center gap-2">
           <span className="font-bold text-sm sm:text-base break-anywhere tracking-tight">{column.name}</span>
           <span className="badge badge-sm badge-primary badge-soft font-medium">{t(`types.${column.type}`)}</span>
-          {column.mixedTypes ? <span className="badge badge-sm badge-warning badge-soft">Mixed</span> : null}
+          {column.mixedTypes ? <span className="badge badge-sm badge-warning badge-soft font-bold">!</span> : null}
         </div>
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs opacity-75 mt-2">

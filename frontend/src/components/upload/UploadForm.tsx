@@ -249,54 +249,6 @@ export function UploadForm() {
         </p>
       </form>
 
-      {/* Feature Highlights Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-        <div className="card bg-base-100 border border-base-300 rounded-2xl p-4 shadow-2xs">
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-xl bg-info/10 text-info grid place-items-center shrink-0">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="font-semibold text-xs sm:text-sm">Instant Profiling</h3>
-              <p className="text-xs opacity-65 mt-0.5">Types, nulls, unique ratios, statistics and quality score.</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="card bg-base-100 border border-base-300 rounded-2xl p-4 shadow-2xs">
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-xl bg-success/10 text-success grid place-items-center shrink-0">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                <line x1="18" y1="20" x2="18" y2="10" />
-                <line x1="12" y1="20" x2="12" y2="4" />
-                <line x1="6" y1="20" x2="6" y2="14" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="font-semibold text-xs sm:text-sm">Auto Visualizations</h3>
-              <p className="text-xs opacity-65 mt-0.5">Histograms, scatter correlation, heatmaps, and chart builder.</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="card bg-base-100 border border-base-300 rounded-2xl p-4 shadow-2xs">
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-xl bg-secondary/10 text-secondary grid place-items-center shrink-0">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="2" y1="12" x2="22" y2="12" />
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="font-semibold text-xs sm:text-sm">Dual Localization</h3>
-              <p className="text-xs opacity-65 mt-0.5">Full English & Bangla interface and numeral translations.</p>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   )
 }

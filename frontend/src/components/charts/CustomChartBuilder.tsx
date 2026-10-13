@@ -14,6 +14,7 @@ const AGGS: Aggregation[] = ['count', 'sum', 'avg', 'min', 'max']
 export function CustomChartBuilder({ id, sheet, analysis }: { id: string; sheet: string; analysis: Analysis }) {
   const { t } = useTranslation('charts')
   const { t: tColumns } = useTranslation('columns')
+  const { t: tCommon } = useTranslation('common')
 
   const columns = analysis.columns
   const numericColumns = columns.filter((c) => c.type === 'integer' || c.type === 'float')
@@ -59,7 +60,7 @@ export function CustomChartBuilder({ id, sheet, analysis }: { id: string; sheet:
             {isFetching ? (
               <span className="badge badge-primary badge-soft gap-1.5 text-xs">
                 <span className="loading loading-spinner loading-xs text-primary" />
-                Aggregating...
+                {tCommon('loading')}
               </span>
             ) : null}
           </div>

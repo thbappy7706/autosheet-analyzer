@@ -100,9 +100,10 @@ export function ExportTab({ id, analysis, filename }: { id: string; analysis: An
                 <polyline points="10 9 9 9 8 9" />
               </svg>
             </div>
-            <h2 className="card-title text-base font-bold">Analysis Profile (JSON)</h2>
+            <h2 className="card-title text-base font-bold">{t('download')} JSON</h2>
             <p className="text-xs opacity-70">
-              Complete computed statistics, type inferences, correlation matrix, and insights in structured JSON.
+              {formatNumber(analysis.overview.rows, opts)} × {formatNumber(analysis.overview.columns, opts)} ·{' '}
+              {formatBytes(analysis.overview.fileSize, opts)}
             </p>
             <div className="flex flex-wrap gap-1.5 pt-1">
               <span className="badge badge-neutral badge-soft badge-xs">
@@ -137,10 +138,7 @@ export function ExportTab({ id, analysis, filename }: { id: string; analysis: An
                 <line x1="15" y1="3" x2="15" y2="21" />
               </svg>
             </div>
-            <h2 className="card-title text-base font-bold">Filtered Table Data (CSV)</h2>
-            <p className="text-xs opacity-70">
-              Download clean UTF-8 encoded CSV with optional search filter and BOM support for Excel & Bangla.
-            </p>
+            <h2 className="card-title text-base font-bold">{t('download')} CSV</h2>
             <div className="pt-1">
               <label className="input input-sm input-bordered flex items-center gap-2 rounded-xl">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" className="opacity-60">
@@ -159,7 +157,7 @@ export function ExportTab({ id, analysis, filename }: { id: string; analysis: An
             </div>
             {exported !== null ? (
               <span className="badge badge-success badge-soft badge-sm gap-1">
-                ✓ Exported {formatNumber(exported, opts)} rows
+                {formatNumber(exported, opts)}
               </span>
             ) : null}
             {error ? <p className="text-xs text-error mt-1 break-anywhere font-medium">{error}</p> : null}
@@ -195,10 +193,8 @@ export function ExportTab({ id, analysis, filename }: { id: string; analysis: An
                 <polyline points="21 15 16 10 5 21" />
               </svg>
             </div>
-            <h2 className="card-title text-base font-bold">Chart Figures (PNG)</h2>
-            <p className="text-xs opacity-70">
-              Download any individual visualization as high-resolution PNG image directly from the charts view.
-            </p>
+            <h2 className="card-title text-base font-bold">{t('exportPng')}</h2>
+            <p className="text-xs opacity-70">{t('nav.charts')}</p>
           </div>
           <Link to="../charts" relative="path" className="btn btn-sm btn-outline gap-2 mt-4 rounded-xl shadow-xs">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">

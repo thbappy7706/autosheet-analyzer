@@ -56,7 +56,6 @@ export function SummaryTab({ analysis }: { analysis: Analysis }) {
           <div className="stat-value text-2xl sm:text-3xl text-primary font-black break-anywhere">
             {formatNumber(overview.rows, opts)}
           </div>
-          <div className="stat-desc opacity-70 text-xs">Total records analyzed</div>
         </div>
 
         <div className="stat py-4 px-5">
@@ -69,7 +68,6 @@ export function SummaryTab({ analysis }: { analysis: Analysis }) {
           <div className="stat-value text-2xl sm:text-3xl text-secondary font-black break-anywhere">
             {formatNumber(overview.columns, opts)}
           </div>
-          <div className="stat-desc opacity-70 text-xs">Attributes profiled</div>
         </div>
 
         <div className="stat py-4 px-5">
@@ -84,7 +82,7 @@ export function SummaryTab({ analysis }: { analysis: Analysis }) {
             {formatNumber(overview.missingCells, opts)}
           </div>
           <div className="stat-desc opacity-70 text-xs">
-            {formatPercent(overview.missingPercent, opts)} empty cells
+            {formatPercent(overview.missingPercent, opts)}
           </div>
         </div>
 
@@ -99,7 +97,6 @@ export function SummaryTab({ analysis }: { analysis: Analysis }) {
           <div className="stat-value text-2xl sm:text-3xl text-accent font-black break-anywhere">
             {formatNumber(overview.duplicateRows, opts)}
           </div>
-          <div className="stat-desc opacity-70 text-xs">Identical rows</div>
         </div>
       </div>
 
@@ -134,7 +131,6 @@ export function SummaryTab({ analysis }: { analysis: Analysis }) {
         {/* Dataset Profile Details */}
         <div className="card bg-base-100 border border-base-300 rounded-2xl shadow-xs lg:col-span-2">
           <div className="card-body p-5 justify-center">
-            <h3 className="font-semibold text-sm mb-3 opacity-80 uppercase tracking-wider text-xs">Dataset Technical Specs</h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               <div className="bg-base-200/50 p-3 rounded-xl border border-base-200">
                 <span className="text-[11px] opacity-60 uppercase tracking-wide block">{t('fileSize')}</span>
@@ -153,7 +149,7 @@ export function SummaryTab({ analysis }: { analysis: Analysis }) {
                 <span className="font-semibold text-sm mt-0.5 block">{formatNumber(overview.emptyColumns, opts)}</span>
               </div>
               <div className="bg-base-200/50 p-3 rounded-xl border border-base-200 sm:col-span-2">
-                <span className="text-[11px] opacity-60 uppercase tracking-wide block">Compute Latency</span>
+                <span className="text-[11px] opacity-60 uppercase tracking-wide block">{t('quality')}</span>
                 <span className="font-semibold text-sm mt-0.5 block">
                   {t('analysisTime', { ms: formatNumber(analysis.durationMs, opts) })}
                 </span>
