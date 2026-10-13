@@ -9,6 +9,7 @@ import type { ColumnProfile } from '../../types/analysis'
 export function ColumnsTab({ columns }: { columns: ColumnProfile[] }) {
   const { t } = useTranslation('columns')
   const [query, setQuery] = useState('')
+  const opts = useFormatOptions()
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -17,21 +18,38 @@ export function ColumnsTab({ columns }: { columns: ColumnProfile[] }) {
   }, [columns, query])
 
   return (
-    <div className="space-y-3">
-      <label className="input input-sm flex items-center gap-2 w-full sm:w-72">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-          <circle cx="11" cy="11" r="7" />
-          <path d="m20 20-3.5-3.5" />
-        </svg>
-        <input
-          type="search"
-          className="grow"
-          placeholder={t('search')}
-          aria-label={t('search')}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-      </label>
+    <div className="space-y-4">
+      {/* Search Toolbar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-base-100 p-3 rounded-2xl border border-base-300 shadow-2xs">
+        <label className="input input-sm input-bordered flex items-center gap-2 w-full sm:w-80 rounded-xl">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" className="opacity-60">
+            <circle cx="11" cy="11" r="7" />
+            <path d="m20 20-3.5-3.5" />
+          </svg>
+          <input
+            type="search"
+            className="grow"
+            placeholder={t('search')}
+            aria-label={t('search')}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+          {query ? (
+            <button
+              type="button"
+              className="btn btn-ghost btn-xs btn-circle"
+              onClick={() => setQuery('')}
+              aria-label="Clear filter"
+            >
+              ✕
+            </button>
+          ) : null}
+        </label>
+
+        <span className="badge badge-neutral badge-soft text-xs font-medium">
+          {formatNumber(filtered.length, opts)} / {formatNumber(columns.length, opts)}
+        </span>
+      </div>
 
       {filtered.length === 0 ? (
         <EmptyState title={t('noColumns')} />
@@ -51,29 +69,40 @@ function ColumnCard({ column }: { column: ColumnProfile }) {
   const opts = useFormatOptions()
 
   return (
-    <details className="collapse collapse-arrow bg-base-100 border border-base-300" open>
+    <details className="collapse collapse-arrow bg-base-100 border border-base-300 rounded-2xl shadow-2xs hover:shadow-sm transition-all" open>
       <summary className="collapse-title pr-10 cursor-pointer">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="font-medium break-anywhere">{column.name}</span>
-          <span className="badge badge-sm badge-primary badge-outline">{t(`types.${column.type}`)}</span>
-          {column.mixedTypes ? <span className="badge badge-sm badge-warning">!</span> : null}
+          <span className="font-bold text-sm sm:text-base break-anywhere tracking-tight">{column.name}</span>
+          <span className="badge badge-sm badge-primary badge-soft font-medium">{t(`types.${column.type}`)}</span>
+          {column.mixedTypes ? <span className="badge badge-sm badge-warning badge-soft">Mixed</span> : null}
         </div>
-        <div className="text-xs opacity-70 mt-1 flex flex-wrap gap-x-3">
-          <span>
-            {t('missing')}: {formatPercent(column.missingPct, opts)}
-          </span>
-          <span>
-            {t('unique')}: {formatNumber(column.unique, opts)}
-          </span>
+
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs opacity-75 mt-2">
+          <div className="flex items-center gap-1.5">
+            <span>{t('missing')}:</span>
+            <span className="font-medium">{formatPercent(column.missingPct, opts)}</span>
+            {column.missingPct > 0 ? (
+              <progress
+                className="progress progress-warning w-16 h-1.5 rounded-full"
+                value={column.missingPct}
+                max={100}
+              />
+            ) : null}
+          </div>
+          <div>
+            <span>{t('unique')}:</span>{' '}
+            <span className="font-medium">{formatNumber(column.unique, opts)}</span>
+          </div>
         </div>
+
         {column.missingPct > 30 ? (
-          <p className="text-xs text-warning mt-1 break-anywhere">{t('missingWarning')}</p>
+          <p className="text-xs text-warning font-medium mt-1.5 break-anywhere">{t('missingWarning')}</p>
         ) : null}
-        {column.mixedTypes ? <p className="text-xs text-warning mt-1 break-anywhere">{t('mixedTypes')}</p> : null}
+        {column.mixedTypes ? <p className="text-xs text-warning font-medium mt-1 break-anywhere">{t('mixedTypes')}</p> : null}
       </summary>
 
-      <div className="collapse-content">
-        <div className="h-40 mb-3">
+      <div className="collapse-content pt-2 border-t border-base-200">
+        <div className="h-44 mb-3 bg-base-200/40 p-2.5 rounded-xl border border-base-200">
           <MiniChart column={column} />
         </div>
         <StatsGrid column={column} />
@@ -95,7 +124,7 @@ function MiniChart({ column }: { column: ColumnProfile }) {
   if (column.categorical && column.categorical.top) {
     return <CategoryBarView data={column.categorical.top.slice(0, 8)} label={column.name} />
   }
-  return <p className="text-sm opacity-60">{column.name}</p>
+  return <p className="text-sm opacity-60 text-center py-8">{column.name}</p>
 }
 
 function StatsGrid({ column }: { column: ColumnProfile }) {
@@ -148,28 +177,31 @@ function StatsGrid({ column }: { column: ColumnProfile }) {
 
   return (
     <div>
-      <dl className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-1 text-xs">
+      <dl className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
         {rows.map(([label, value]) => (
-          <div key={label} className="flex justify-between gap-2 border-b border-base-200 py-1">
-            <dt className="opacity-60">{label}</dt>
-            <dd className="font-medium break-anywhere text-right">{value}</dd>
+          <div key={label} className="bg-base-200/40 p-2 rounded-lg border border-base-200 flex justify-between items-center gap-1">
+            <dt className="opacity-60 truncate">{label}</dt>
+            <dd className="font-semibold break-anywhere text-right">{value}</dd>
           </div>
         ))}
       </dl>
 
       {column.categorical && column.categorical.top && column.categorical.top.length > 0 ? (
-        <div className="mt-3">
-          <h4 className="text-xs uppercase tracking-wide opacity-60 mb-1">{t('topValues')}</h4>
-          <ul className="text-xs space-y-1">
+        <div className="mt-4 pt-3 border-t border-base-200">
+          <h4 className="text-xs uppercase tracking-wider font-semibold opacity-60 mb-2">{t('topValues')}</h4>
+          <div className="space-y-1.5 text-xs">
             {column.categorical.top.slice(0, 5).map((v) => (
-              <li key={v.value} className="flex justify-between gap-2">
-                <span className="break-anywhere">{v.value}</span>
-                <span className="opacity-70 shrink-0">
-                  {formatNumber(v.count, opts)} · {formatPercent(v.pct, opts)}
-                </span>
-              </li>
+              <div key={v.value} className="space-y-1">
+                <div className="flex justify-between items-center gap-2">
+                  <span className="font-medium break-anywhere truncate max-w-[200px]">{v.value}</span>
+                  <span className="opacity-70 shrink-0 text-[11px]">
+                    {formatNumber(v.count, opts)} ({formatPercent(v.pct, opts)})
+                  </span>
+                </div>
+                <progress className="progress progress-primary w-full h-1.5 rounded-full" value={v.pct} max={100} />
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       ) : null}
     </div>

@@ -42,9 +42,12 @@ export function ChartsTab({ id, sheet, analysis }: { id: string; sheet: string; 
 
   return (
     <div className="space-y-4">
-      <section>
-        <h2 className="text-sm font-semibold uppercase tracking-wide opacity-60 mb-2">{t('gallery')}</h2>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+      <section className="space-y-3">
+        <div className="flex items-center gap-2">
+          <h2 className="text-xs font-bold uppercase tracking-wider opacity-60">{t('gallery')}</h2>
+          <span className="badge badge-primary badge-soft badge-xs">Automated Plots</span>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {numeric.slice(0, 8).map((column) => (
             <ChartCard
               key={`hist-${column.name}`}
@@ -91,7 +94,11 @@ export function ChartsTab({ id, sheet, analysis }: { id: string; sheet: string; 
       </section>
 
       {numeric.length > 0 ? (
-        <section>
+        <section className="space-y-3">
+          <div className="flex items-center gap-2">
+            <h2 className="text-xs font-bold uppercase tracking-wider opacity-60">{tColumns('outliers')}</h2>
+            <span className="badge badge-warning badge-soft badge-xs">Anomaly Detection</span>
+          </div>
           <ChartCard title={tColumns('outliers')} subtitle={tColumns('stats')}>
             <OutlierChart columns={numeric} />
           </ChartCard>
@@ -100,11 +107,14 @@ export function ChartsTab({ id, sheet, analysis }: { id: string; sheet: string; 
 
       {analysis.correlation.columns.length >= 2 ? (
         <section className="space-y-3">
-          <h2 className="text-sm font-semibold uppercase tracking-wide opacity-60">{t('correlation')}</h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-xs font-bold uppercase tracking-wider opacity-60">{t('correlation')}</h2>
+            <span className="badge badge-secondary badge-soft badge-xs">Pearson r</span>
+          </div>
           <ChartCard title={t('heatmap')} subtitle={t('correlation')} height={Math.max(240, analysis.correlation.columns.length * 34)}>
             <CorrelationHeatmap correlation={analysis.correlation} />
           </ChartCard>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {(analysis.correlation.topPositive?.length ?? 0) > 0 ? (
               <ChartCard title={t('topPositive')} subtitle={t('correlation')}>
                 <CorrelationBars pairs={analysis.correlation.topPositive ?? []} positive />
@@ -145,7 +155,13 @@ function ScatterCard({ id, sheet, pair }: { id: string; sheet: string; pair: Cor
 
   return (
     <ChartCard title={`${pair.a} · ${pair.b}`} subtitle={`${t('scatter')} · r = ${pair.r.toFixed(2)}`}>
-      {isLoading ? <p className="text-sm opacity-60">{t('generating')}</p> : <ScatterView points={points} xName={pair.a} yName={pair.b} />}
+      {isLoading ? (
+        <div className="flex items-center justify-center h-full">
+          <span className="loading loading-spinner loading-md text-primary" />
+        </div>
+      ) : (
+        <ScatterView points={points} xName={pair.a} yName={pair.b} />
+      )}
     </ChartCard>
   )
 }
@@ -158,24 +174,29 @@ function OutlierChart({ columns }: { columns: ColumnProfile[] }) {
     .filter((r) => r.count > 0)
     .sort((a, b) => b.count - a.count)
 
-  if (rows.length === 0) return <p className="text-sm opacity-60">{t('noCharts')}</p>
+  if (rows.length === 0) return <p className="text-sm opacity-60 text-center py-10">{t('noCharts')}</p>
+
+  const max = rows[0]?.count ?? 1
 
   return (
-    <div className="space-y-2 overflow-auto h-full pr-1">
-      {rows.map((r) => {
-        const max = rows[0]?.count ?? 1
-        return (
-          <div key={r.name} className="flex items-center gap-2 text-xs">
-            <span className="w-32 truncate" title={r.name}>
-              {r.name}
-            </span>
-            <div className="flex-1 bg-base-200 rounded h-3">
-              <div className="bg-error/70 h-3 rounded" style={{ width: `${(r.count / max) * 100}%` }} />
-            </div>
-            <span className="w-10 text-right">{r.count}</span>
+    <div className="space-y-3 overflow-auto h-full pr-1">
+      {rows.map((r) => (
+        <div key={r.name} className="flex items-center gap-3 text-xs">
+          <span className="w-36 font-medium truncate" title={r.name}>
+            {r.name}
+          </span>
+          <div className="flex-1">
+            <progress
+              className="progress progress-error w-full h-2 rounded-full"
+              value={r.count}
+              max={max}
+            />
           </div>
-        )
-      })}
+          <span className="badge badge-error badge-soft badge-sm font-mono w-12 text-center shrink-0">
+            {r.count}
+          </span>
+        </div>
+      ))}
     </div>
   )
 }

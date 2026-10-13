@@ -104,102 +104,199 @@ export function UploadForm() {
   }
 
   return (
-    <form action={formAction} className="w-full">
-      <input
-        ref={inputRef}
-        type="file"
-        name="file"
-        className="sr-only"
-        accept=".csv,.tsv,.txt,.xlsx,.xlsm,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        onChange={(e) => {
-          const file = e.target.files?.[0]
-          if (!file) return
-          setSelectedName(file.name)
-          // Selecting a file starts the analysis immediately.
-          e.currentTarget.form?.requestSubmit()
-        }}
-      />
+    <div className="w-full space-y-6">
+      <form action={formAction} className="w-full">
+        <input
+          ref={inputRef}
+          type="file"
+          name="file"
+          className="sr-only"
+          accept=".csv,.tsv,.txt,.xlsx,.xlsm,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          onChange={(e) => {
+            const file = e.target.files?.[0]
+            if (!file) return
+            setSelectedName(file.name)
+            // Selecting a file starts the analysis immediately.
+            e.currentTarget.form?.requestSubmit()
+          }}
+        />
 
-      <div
-        role="button"
-        tabIndex={0}
-        aria-label={t('browse')}
-        onClick={() => inputRef.current?.click()}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
+        <div
+          role="button"
+          tabIndex={0}
+          aria-label={t('browse')}
+          onClick={() => inputRef.current?.click()}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              inputRef.current?.click()
+            }
+          }}
+          onDragOver={(e) => {
             e.preventDefault()
-            inputRef.current?.click()
-          }
-        }}
-        onDragOver={(e) => {
-          e.preventDefault()
-          setDragging(true)
-        }}
-        onDragLeave={() => setDragging(false)}
-        onDrop={onDrop}
-        className={`flex flex-col items-center justify-center gap-3 w-full rounded-2xl border-2 border-dashed p-8 sm:p-12 cursor-pointer transition-colors ${
-          dragging ? 'border-primary bg-primary/10' : 'border-base-300 bg-base-100 hover:border-primary/60'
-        }`}
-      >
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="opacity-70" aria-hidden="true">
-          <path d="M12 16V4m0 0 4 4m-4-4L8 8" />
-          <path d="M20 16v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2" />
-        </svg>
-        <div className="text-center">
-          <p className="font-medium">
-            {dragging ? t('dropHere') : t('dropzone')}{' '}
-            <span className="link link-primary">{t('browse')}</span>
-          </p>
-          <p className="text-xs opacity-70 mt-1">
-            {t('supported')} · {t('maxSize', { size: MAX_UPLOAD_SIZE / (1024 * 1024) })}
-          </p>
-          {selectedName ? <p className="text-xs mt-2 break-anywhere opacity-90">{selectedName}</p> : null}
-        </div>
-      </div>
-
-      {pending ? (
-        <div className="mt-4 space-y-2">
-          <div className="flex justify-between text-sm">
-            <span>{progress >= 100 ? t('processing') : t('uploading', { percent: progress })}</span>
-            <button type="button" className="btn btn-xs btn-ghost" onClick={cancel}>
-              {t('cancelUpload')}
-            </button>
+            setDragging(true)
+          }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={onDrop}
+          className={`flex flex-col items-center justify-center gap-4 w-full rounded-3xl border-2 border-dashed p-8 sm:p-14 cursor-pointer transition-all duration-200 group ${
+            dragging
+              ? 'border-primary bg-primary/10 shadow-lg scale-[1.01]'
+              : 'border-base-300 bg-base-100 hover:border-primary/70 hover:shadow-md'
+          }`}
+        >
+          <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary grid place-items-center group-hover:scale-110 transition-transform">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
           </div>
-          <progress className="progress progress-primary w-full" value={progress} max={100} />
-          <p className="text-xs opacity-60">{t('analyzingProgress')}</p>
-        </div>
-      ) : null}
 
-      {state.status === 'error' && state.error ? (
-        <div role="alert" className="alert alert-error mt-4">
-          <span className="text-sm break-anywhere">{state.error}</span>
-        </div>
-      ) : null}
+          <div className="text-center space-y-1">
+            <p className="font-semibold text-base sm:text-lg">
+              {dragging ? t('dropHere') : t('dropzone')}
+            </p>
+            <p className="text-xs opacity-70">
+              {t('maxSize', { size: MAX_UPLOAD_SIZE / (1024 * 1024) })}
+            </p>
 
-      {state.status === 'success' && state.upload && state.upload.sheets.length > 1 ? (
-        <div className="mt-4 card bg-base-100 border border-base-300">
-          <div className="card-body p-4">
-            <h2 className="card-title text-base">{t('chooseSheet')}</h2>
-            <p className="text-sm opacity-70">{t('chooseSheetHelp')}</p>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {state.upload.sheets.map((sheet) => (
-                <button
-                  key={sheet}
-                  type="button"
-                  className="btn btn-sm btn-outline"
-                  onClick={() => navigate(`/d/${state.upload?.id}/summary?sheet=${encodeURIComponent(sheet)}`)}
-                >
-                  {sheet}
-                </button>
-              ))}
+            <div className="pt-2 flex flex-wrap items-center justify-center gap-1.5">
+              <span className="badge badge-neutral badge-soft badge-sm">XLSX</span>
+              <span className="badge badge-neutral badge-soft badge-sm">XLS</span>
+              <span className="badge badge-neutral badge-soft badge-sm">CSV</span>
+              <span className="badge badge-neutral badge-soft badge-sm">TSV</span>
+            </div>
+
+            {selectedName ? (
+              <div className="pt-3">
+                <span className="badge badge-primary badge-outline gap-1.5 py-3 px-3 text-xs max-w-xs sm:max-w-md truncate">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                    <polyline points="14 2 14 8 20 8" />
+                  </svg>
+                  {selectedName}
+                </span>
+              </div>
+            ) : (
+              <div className="pt-3">
+                <span className="btn btn-primary btn-sm gap-2 shadow-xs group-hover:btn-active">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                    <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
+                    <path d="M12 12v9" />
+                    <path d="m16 16-4-4-4 4" />
+                  </svg>
+                  {t('browse')}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {pending ? (
+          <div className="mt-4 card bg-base-100 border border-base-300 p-4 rounded-2xl shadow-xs space-y-2">
+            <div className="flex justify-between items-center text-sm">
+              <span className="flex items-center gap-2 font-medium">
+                <span className="loading loading-spinner loading-xs text-primary" />
+                {progress >= 100 ? t('processing') : t('uploading', { percent: progress })}
+              </span>
+              <button type="button" className="btn btn-xs btn-ghost text-error" onClick={cancel}>
+                {t('cancelUpload')}
+              </button>
+            </div>
+            <progress className="progress progress-primary w-full h-2 rounded-full" value={progress} max={100} />
+            <p className="text-xs opacity-60">{t('analyzingProgress')}</p>
+          </div>
+        ) : null}
+
+        {state.status === 'error' && state.error ? (
+          <div role="alert" className="alert alert-error alert-soft rounded-2xl shadow-xs mt-4">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" className="shrink-0">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            <span className="text-sm font-medium break-anywhere">{state.error}</span>
+          </div>
+        ) : null}
+
+        {state.status === 'success' && state.upload && state.upload.sheets.length > 1 ? (
+          <div className="mt-4 card bg-base-100 border border-base-300 rounded-2xl shadow-sm">
+            <div className="card-body p-4 sm:p-5">
+              <h2 className="card-title text-base">{t('chooseSheet')}</h2>
+              <p className="text-xs opacity-70">{t('chooseSheetHelp')}</p>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {state.upload.sheets.map((sheet) => (
+                  <button
+                    key={sheet}
+                    type="button"
+                    className="btn btn-sm btn-outline btn-primary gap-1.5"
+                    onClick={() => navigate(`/d/${state.upload?.id}/summary?sheet=${encodeURIComponent(sheet)}`)}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                      <rect width="18" height="18" x="3" y="3" rx="2" />
+                      <path d="M3 9h18M9 21V9" />
+                    </svg>
+                    {sheet}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        <p className="sr-only" aria-live="polite">
+          {pending ? tCommon('loading') : ''}
+        </p>
+      </form>
+
+      {/* Feature Highlights Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+        <div className="card bg-base-100 border border-base-300 rounded-2xl p-4 shadow-2xs">
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 rounded-xl bg-info/10 text-info grid place-items-center shrink-0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="font-semibold text-xs sm:text-sm">Instant Profiling</h3>
+              <p className="text-xs opacity-65 mt-0.5">Types, nulls, unique ratios, statistics and quality score.</p>
             </div>
           </div>
         </div>
-      ) : null}
 
-      <p className="sr-only" aria-live="polite">
-        {pending ? tCommon('loading') : ''}
-      </p>
-    </form>
+        <div className="card bg-base-100 border border-base-300 rounded-2xl p-4 shadow-2xs">
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 rounded-xl bg-success/10 text-success grid place-items-center shrink-0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <line x1="18" y1="20" x2="18" y2="10" />
+                <line x1="12" y1="20" x2="12" y2="4" />
+                <line x1="6" y1="20" x2="6" y2="14" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="font-semibold text-xs sm:text-sm">Auto Visualizations</h3>
+              <p className="text-xs opacity-65 mt-0.5">Histograms, scatter correlation, heatmaps, and chart builder.</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="card bg-base-100 border border-base-300 rounded-2xl p-4 shadow-2xs">
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 rounded-xl bg-secondary/10 text-secondary grid place-items-center shrink-0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="2" y1="12" x2="22" y2="12" />
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="font-semibold text-xs sm:text-sm">Dual Localization</h3>
+              <p className="text-xs opacity-65 mt-0.5">Full English & Bangla interface and numeral translations.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }

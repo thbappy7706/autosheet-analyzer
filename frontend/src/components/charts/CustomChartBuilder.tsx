@@ -49,34 +49,53 @@ export function CustomChartBuilder({ id, sheet, analysis }: { id: string; sheet:
 
   return (
     <div className="space-y-4">
-      <div className="card bg-base-100 border border-base-300">
-        <div className="card-body p-4">
-          <h2 className="card-title text-base">{t('builder')}</h2>
-          <p className="text-sm opacity-70">{t('builderHelp')}</p>
+      <div className="card bg-base-100 border border-base-300 rounded-2xl shadow-xs">
+        <div className="card-body p-4 sm:p-5">
+          <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-base-200">
+            <div>
+              <h2 className="card-title text-base font-bold">{t('builder')}</h2>
+              <p className="text-xs opacity-70 mt-0.5">{t('builderHelp')}</p>
+            </div>
+            {isFetching ? (
+              <span className="badge badge-primary badge-soft gap-1.5 text-xs">
+                <span className="loading loading-spinner loading-xs text-primary" />
+                Aggregating...
+              </span>
+            ) : null}
+          </div>
+
+          {/* Chart Type Selector Pills */}
+          <div className="pt-2">
+            <span className="text-xs font-semibold uppercase tracking-wider opacity-60 block mb-1.5">
+              {t('chartType')}
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {CHART_TYPES.map((ct) => (
+                <button
+                  key={ct}
+                  type="button"
+                  className={`btn btn-sm capitalize rounded-xl ${
+                    chartType === ct ? 'btn-primary font-bold shadow-xs' : 'btn-ghost border-base-300'
+                  }`}
+                  onClick={() => {
+                    setOptimisticType(ct)
+                    setChartType(ct)
+                  }}
+                >
+                  {t(ct)}
+                </button>
+              ))}
+            </div>
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-2">
             <label className="form-control">
-              <span className="label-text text-xs mb-1">{t('chartType')}</span>
+              <span className="label-text text-xs font-medium mb-1">{t('xAxis')}</span>
               <select
-                className="select select-sm select-bordered"
-                value={chartType}
-                onChange={(e) => {
-                  const next = e.target.value as BuilderChartType
-                  setOptimisticType(next)
-                  setChartType(next)
-                }}
+                className="select select-sm select-bordered rounded-xl"
+                value={x}
+                onChange={(e) => setX(e.target.value)}
               >
-                {CHART_TYPES.map((ct) => (
-                  <option key={ct} value={ct}>
-                    {t(ct)}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="form-control">
-              <span className="label-text text-xs mb-1">{t('xAxis')}</span>
-              <select className="select select-sm select-bordered" value={x} onChange={(e) => setX(e.target.value)}>
                 {groupableColumns.map((c) => (
                   <option key={c.name} value={c.name}>
                     {c.name}
@@ -86,9 +105,9 @@ export function CustomChartBuilder({ id, sheet, analysis }: { id: string; sheet:
             </label>
 
             <label className="form-control">
-              <span className="label-text text-xs mb-1">{t('yAxis')}</span>
+              <span className="label-text text-xs font-medium mb-1">{t('yAxis')}</span>
               <select
-                className="select select-sm select-bordered"
+                className="select select-sm select-bordered rounded-xl"
                 value={y}
                 disabled={!needsY}
                 onChange={(e) => setY(e.target.value)}
@@ -103,9 +122,9 @@ export function CustomChartBuilder({ id, sheet, analysis }: { id: string; sheet:
             </label>
 
             <label className="form-control">
-              <span className="label-text text-xs mb-1">{t('aggregation')}</span>
+              <span className="label-text text-xs font-medium mb-1">{t('aggregation')}</span>
               <select
-                className="select select-sm select-bordered"
+                className="select select-sm select-bordered rounded-xl"
                 value={agg}
                 onChange={(e) => setAgg(e.target.value as Aggregation)}
               >
@@ -118,8 +137,12 @@ export function CustomChartBuilder({ id, sheet, analysis }: { id: string; sheet:
             </label>
 
             <label className="form-control">
-              <span className="label-text text-xs mb-1">{t('groupBy')}</span>
-              <select className="select select-sm select-bordered" value={groupBy} onChange={(e) => setGroupBy(e.target.value)}>
+              <span className="label-text text-xs font-medium mb-1">{t('groupBy')}</span>
+              <select
+                className="select select-sm select-bordered rounded-xl"
+                value={groupBy}
+                onChange={(e) => setGroupBy(e.target.value)}
+              >
                 <option value="">{t('none')}</option>
                 {groupableColumns.map((c) => (
                   <option key={c.name} value={c.name}>
@@ -139,8 +162,10 @@ export function CustomChartBuilder({ id, sheet, analysis }: { id: string; sheet:
           title={`${optimisticType.toUpperCase()} · ${x}${needsY && y ? ` → ${y}` : ''}`}
           subtitle={`${t(agg)}${groupBy ? ` · ${t('groupBy')}: ${groupBy}` : ''}`}
         >
-          {isError ? <p className="text-sm text-error">{tColumns('noColumns')}</p> : null}
-          {!isError && trimmed.length === 0 && !isFetching ? <p className="text-sm opacity-60">{t('noCharts')}</p> : null}
+          {isError ? <p className="text-sm text-error text-center py-10">{tColumns('noColumns')}</p> : null}
+          {!isError && trimmed.length === 0 && !isFetching ? (
+            <p className="text-sm opacity-60 text-center py-10">{t('noCharts')}</p>
+          ) : null}
           {!isError && trimmed.length > 0 ? <BuilderChart type={optimisticType} points={trimmed} name={x} /> : null}
         </ChartCard>
       )}

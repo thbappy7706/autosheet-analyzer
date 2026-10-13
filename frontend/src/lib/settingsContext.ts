@@ -2,10 +2,11 @@ import { createContext, useContext, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { SupportedLanguage } from '../i18n'
 
-export type Theme = 'light' | 'dark'
+export type Theme = string
 
 export interface SettingsValue {
   theme: Theme
+  setTheme: (theme: string) => void
   toggleTheme: () => void
   banglaDigits: boolean
   setBanglaDigits: (v: boolean) => void

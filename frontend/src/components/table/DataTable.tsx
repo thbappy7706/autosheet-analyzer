@@ -109,51 +109,82 @@ export function DataTable({
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap items-center gap-2">
-        <label className="input input-sm flex items-center gap-2 w-full sm:w-72">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-            <circle cx="11" cy="11" r="7" />
-            <path d="m20 20-3.5-3.5" />
-          </svg>
-          <input
-            type="search"
-            className="grow"
-            placeholder={t('searchPlaceholder')}
-            aria-label={t('searchPlaceholder')}
-            value={filterInput}
+      {/* Table controls toolbar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-base-100 p-3 rounded-2xl border border-base-300 shadow-2xs">
+        <div className="flex flex-wrap items-center gap-2">
+          <label className="input input-sm input-bordered flex items-center gap-2 w-full sm:w-72 rounded-xl">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" className="opacity-60">
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-3.5-3.5" />
+            </svg>
+            <input
+              type="search"
+              className="grow"
+              placeholder={t('searchPlaceholder')}
+              aria-label={t('searchPlaceholder')}
+              value={filterInput}
+              onChange={(e) => {
+                setFilterInput(e.target.value)
+                setPage(1)
+              }}
+            />
+            {filterInput ? (
+              <button
+                type="button"
+                className="btn btn-ghost btn-xs btn-circle"
+                onClick={() => {
+                  setFilterInput('')
+                  setPage(1)
+                }}
+                aria-label="Clear search"
+              >
+                ✕
+              </button>
+            ) : null}
+          </label>
+
+          <select
+            className="select select-sm select-bordered rounded-xl"
+            aria-label={t('pageSize')}
+            value={pageSize}
             onChange={(e) => {
-              setFilterInput(e.target.value)
+              setPageSize(Number(e.target.value))
               setPage(1)
             }}
-          />
-        </label>
+          >
+            {PAGE_SIZES.map((size) => (
+              <option key={size} value={size}>
+                {formatNumber(size, opts)} / {t('title')}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        <select
-          className="select select-sm select-bordered"
-          aria-label={t('pageSize')}
-          value={pageSize}
-          onChange={(e) => {
-            setPageSize(Number(e.target.value))
-            setPage(1)
-          }}
-        >
-          {PAGE_SIZES.map((size) => (
-            <option key={size} value={size}>
-              {formatNumber(size, opts)} / {t('title')}
-            </option>
-          ))}
-        </select>
-
-        {data?.filtered ? <span className="badge badge-sm badge-info">{t('filtered')}</span> : null}
-        {query.isFetching ? <span className="loading loading-spinner loading-xs" /> : null}
+        <div className="flex items-center gap-2">
+          {data?.filtered ? (
+            <span className="badge badge-sm badge-info badge-soft gap-1">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+              </svg>
+              {t('filtered')}
+            </span>
+          ) : null}
+          {query.isFetching ? (
+            <div className="flex items-center gap-1.5 text-xs text-primary font-medium">
+              <span className="loading loading-spinner loading-xs text-primary" />
+              <span>Updating...</span>
+            </div>
+          ) : null}
+        </div>
       </div>
 
+      {/* Table container */}
       <div
         ref={scrollRef}
-        className="overflow-auto max-h-[65vh] rounded-box border border-base-300 bg-base-100"
+        className="overflow-auto max-h-[65vh] rounded-2xl border border-base-300 bg-base-100 shadow-xs"
         style={{ contain: 'strict' }}
       >
-        <table className="table table-sm table-pin-rows w-full">
+        <table className="table table-sm table-pin-rows table-zebra w-full">
           <thead>
             {table.getHeaderGroups().map((hg) => (
               <tr key={hg.id}>
@@ -161,10 +192,10 @@ export function DataTable({
                   const type = typeByName.get(header.column.id)
                   const sorted = header.column.getIsSorted()
                   return (
-                    <th key={header.id} className="bg-base-200 whitespace-nowrap">
+                    <th key={header.id} className="bg-base-200/90 backdrop-blur whitespace-nowrap py-2.5">
                       <button
                         type="button"
-                        className="flex items-center gap-1 w-full text-left"
+                        className="flex items-center gap-1.5 w-full text-left font-semibold hover:text-primary transition-colors"
                         onClick={header.column.getToggleSortingHandler()}
                         aria-label={
                           sorted === 'desc'
@@ -176,12 +207,21 @@ export function DataTable({
                         title={header.column.id}
                       >
                         {type ? (
-                          <span aria-hidden="true" className="opacity-60 text-[10px] w-3 shrink-0">
+                          <span
+                            aria-hidden="true"
+                            className="badge badge-xs badge-neutral badge-outline font-mono text-[9px] px-1"
+                          >
                             {typeIcon(type)}
                           </span>
                         ) : null}
-                        <span className="truncate max-w-[200px]">{flexRender(header.column.columnDef.header, header.getContext())}</span>
-                        {sorted ? <span aria-hidden="true">{sorted === 'desc' ? '▾' : '▴'}</span> : null}
+                        <span className="truncate max-w-[200px] text-xs">
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                        </span>
+                        {sorted ? (
+                          <span aria-hidden="true" className="badge badge-xs badge-primary">
+                            {sorted === 'desc' ? '▾' : '▴'}
+                          </span>
+                        ) : null}
                       </button>
                     </th>
                   )
@@ -196,6 +236,7 @@ export function DataTable({
               return (
                 <tr
                   key={row.id}
+                  className="hover:bg-primary/5 transition-colors"
                   style={{
                     position: 'absolute',
                     top: 0,
@@ -207,7 +248,7 @@ export function DataTable({
                   }}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="truncate max-w-[240px]" title={String(cell.getValue() ?? '')}>
+                    <td key={cell.id} className="truncate max-w-[240px] text-xs" title={String(cell.getValue() ?? '')}>
                       {String(cell.getValue() ?? '')}
                     </td>
                   ))}
@@ -218,29 +259,41 @@ export function DataTable({
         </table>
 
         {rows.length === 0 && !query.isLoading ? (
-          <p className="text-center text-sm opacity-70 py-8">{t('noResults')}</p>
+          <div className="text-center py-12 px-4 space-y-2">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="mx-auto opacity-40" aria-hidden="true">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <p className="text-sm font-medium opacity-70">{t('noResults')}</p>
+          </div>
         ) : null}
-        {query.isLoading ? <p className="text-center text-sm opacity-70 py-8">{t('loading')}</p> : null}
+        {query.isLoading ? (
+          <div className="flex flex-col items-center justify-center py-12 space-y-2">
+            <span className="loading loading-spinner loading-md text-primary" />
+            <p className="text-xs opacity-70">{t('loading')}</p>
+          </div>
+        ) : null}
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
-        <span className="opacity-70">
+      {/* Pagination footer */}
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-base-100 p-3 rounded-2xl border border-base-300 shadow-2xs">
+        <span className="text-xs opacity-70 font-medium">
           {tCommon('showing', {
             from: formatNumber(from, opts),
             to: formatNumber(to, opts),
             total: formatNumber(total, opts),
           })}
         </span>
-        <div className="join">
+        <div className="join shadow-2xs">
           <button
             type="button"
             className="btn btn-sm join-item"
             disabled={page <= 1}
             onClick={() => setPage((p) => Math.max(1, p - 1))}
           >
-            {t('previous')}
+            « {t('previous')}
           </button>
-          <span className="btn btn-sm join-item no-animation pointer-events-none">
+          <span className="btn btn-sm join-item no-animation pointer-events-none text-xs font-semibold">
             {tCommon('page')} {formatNumber(page, opts)} / {formatNumber(totalPages, opts)}
           </span>
           <button
@@ -249,7 +302,7 @@ export function DataTable({
             disabled={page >= totalPages}
             onClick={() => setPage((p) => p + 1)}
           >
-            {t('next')}
+            {t('next')} »
           </button>
         </div>
       </div>
